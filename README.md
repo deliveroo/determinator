@@ -20,7 +20,34 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Initialize
+
+Initialise a Determinator instance for your app with details of where the source data comes from and how it should be cached:
+
+```ruby
+App.determinator = Determinator.configure(
+  bootstrap_url: "https://ats.deliveroo.net/",
+  storage: Determinator::Storage::Redis.new(redis_connection),
+  retrieval: Determinator::Retrieval::Routemaster.new,
+)
+# => #<Determinator::Control>
+```
+
+Once initialized it will keep itself up to date, you can just query it for determination arbitration:
+
+```ruby
+App.determinator.for_actor(id: 1, guid: 123).which_variant(123)
+# => "aubergine"
+
+arnie = App.determinator.for_actor(id: 1, guid: 123, constraints: { country: 'uk' })
+# => #<Determinator::ActorControl id: 1, guid: 123, constraints: { country: 'uk'}>
+
+arnie.which_variant(456)
+# => false
+
+arnie.show_feature?(78)
+# => true
+```
 
 ## Development
 

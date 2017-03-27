@@ -37,7 +37,7 @@ module Determinator
     Indicators = Struct.new(:rollout, :variant)
 
     def determinate(name, id:, guid:, constraints:)
-      feature = feature_store.get(name)
+      feature = feature_store.feature(name)
       return false unless feature
 
       # Calling method can place constraints on the feature, eg. experiment only
