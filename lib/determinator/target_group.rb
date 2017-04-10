@@ -19,5 +19,19 @@ module Determinator
       pc = (rollout_percent * 100).to_f.round(1)
       "<#{pc}% of those matching: #{constraints}>"
     end
+
+    def to_hash
+      {
+        'rollout'     => rollout,
+        'constraints' => constraints
+      }
+    end
+
+    def self.from_hash(hash)
+      new(
+        rollout:     hash['rollout'],
+        constraints: hash['constraints']
+      )
+    end
   end
 end
