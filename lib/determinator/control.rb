@@ -74,20 +74,20 @@ module Determinator
 
     def indicators_for(feature, id, guid)
       # If we're slicing by guid then we never pay attention to id
-      identifier = case feature.slice_type
-                   when :id       then id
-                   when :guid     then guid
-                   when :fallback then id || guid
-                   end
+      actor_identifier = case feature.bucket_type
+                         when :id       then id
+                         when :guid     then guid
+                         when :fallback then id || guid
+                         end
       # No identified means not enough info was given by the caller
       # to determine an outcome for this feature
-      if identifier.nil?
-        raise ArgumentError, "Identifier for '#{feature.slice_type}' type cannot be found from id: #{id}, guid: #{guid}"
+      if actor_identifier.nil?
+        raise ArgumentError, "Identifier for '#{feature.bucket_type}' type cannot be found from id: #{id}, guid: #{guid}"
       end
 
       # Cryptographic hash (will have random distribution)
       hash = Digest::MD5.new
-      hash.update [feature.seed, identifier].map(&:to_s).join(',')
+      hash.update [feature.identifier, actor_identifier].map(&:to_s).join(',')
 
       # Use lowest 16 bits for rollout indicator
       # Use next 16 bits for variant indicator
@@ -98,8 +98,8 @@ module Determinator
 
     def variant_for(feature, indicator)
       # Scale up the weights so the variants fit within the possible space for the variant indicator
-      variant_weight_total = feature.variants.values.reduce(0) { |sum, weight| sum + weight }
-      scale_factor = 65535 / variant_weight_total.to_f
+      variant_weight_total = feature.variants.values.reduce(:+)
+      scale_factor = 65_535 / variant_weight_total.to_f
 
       # Find the variant the indicator sits within
       previous_upper_bound = 0

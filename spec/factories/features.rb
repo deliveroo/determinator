@@ -1,8 +1,8 @@
 FactoryGirl.define do
   factory :feature, class: Determinator::Feature do
     sequence :name
-    seed { name }
-    slice_type :guid
+    identifier { name }
+    bucket_type :guid
 
     # Not an experiment by default
     variants Hash.new

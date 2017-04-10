@@ -1,5 +1,5 @@
 module Determinator
-  # A decoractor to provide syntactic sugar for Determinator::Control.
+  # A decorator to provide syntactic sugar for Determinator::Control.
   # Useful for contexts where the actor remains constant (eg. inside
   # the request cycle in a webapp)
   class ActorControl
@@ -12,8 +12,8 @@ module Determinator
       @controller = controller
     end
 
-    def variant_for(name, constraints: {})
-      controller.variant_for(
+    def which_variant(name, constraints: {})
+      controller.which_variant(
         name,
         id: id,
         guid: guid,

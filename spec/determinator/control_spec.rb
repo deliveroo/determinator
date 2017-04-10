@@ -4,7 +4,7 @@ describe Determinator::Control do
   let(:instance) { described_class.new(feature_store: feature_store) }
   let(:feature_store) { double }
   let(:feature_name) { 'name' }
-  let(:feature_seed) { feature_name }
+  let(:feature_identifier) { feature_name }
   let(:feature_constraints) { {} }
   let(:feature) { nil }
 
@@ -14,7 +14,7 @@ describe Determinator::Control do
   let(:id) { '123' }
   let(:overrides) { {} }
   let(:rollout) { 65_536 }
-  # For the default seed and id this is the lowest rollout percentage
+  # For the default identifier and id this is the lowest rollout percentage
   let(:not_quite_enough_rollout) { 2_024 }
 
   before do
@@ -67,7 +67,7 @@ describe Determinator::Control do
     end
   end
 
-  shared_examples 'a feature with seed responses' do |responses|
+  shared_examples 'a feature with identifier responses' do |responses|
     context 'when the rollout is just enough to reach this actor' do
       let(:rollout) { not_quite_enough_rollout + 1 }
 
@@ -86,8 +86,8 @@ describe Determinator::Control do
       it { should eq false }
     end
 
-    context 'when the feature has a different seed' do
-      let(:feature_seed) { 'another' }
+    context 'when the feature has a different identifier' do
+      let(:feature_identifier) { 'another' }
       let(:not_quite_enough_rollout) { 61_820 }
 
       context 'when the rollout is just enough to reach this actor' do
@@ -132,13 +132,13 @@ describe Determinator::Control do
     ) }
     let(:feature) { FactoryGirl.create(:feature,
       name: feature_name,
-      seed: feature_seed,
+      identifier: feature_identifier,
       overrides: overrides,
       rollout: rollout,
       constraints: feature_constraints
     ) }
 
-    it_behaves_like 'a feature with seed responses', name: true, another: true
+    it_behaves_like 'a feature with identifier responses', name: true, another: true
 
     context 'when the requested feature is not a feature, but a fully rolled out experiment' do
       let(:feature) { FactoryGirl.create(:experiment, :full_rollout) }
@@ -157,13 +157,13 @@ describe Determinator::Control do
     ) }
     let(:feature) { FactoryGirl.create(:experiment,
       name: feature_name,
-      seed: feature_seed,
+      identifier: feature_identifier,
       overrides: overrides,
       rollout: rollout,
       constraints: feature_constraints
     ) }
 
-    it_behaves_like 'a feature with seed responses', name: 'b', another: 'a'
+    it_behaves_like 'a feature with identifier responses', name: 'b', another: 'a'
 
     context 'when the requested feature is not an experiment, but a fully rolled out feature' do
       let(:feature) { FactoryGirl.create(:feature, :full_rollout) }
