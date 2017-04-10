@@ -18,7 +18,7 @@ describe Determinator::Control do
   let(:not_quite_enough_rollout) { 2_024 }
 
   before do
-    allow(feature_store).to receive(:get).with(feature_name).and_return(feature)
+    allow(feature_store).to receive(:feature).with(feature_name).and_return(feature)
   end
 
   describe '#for_actor' do

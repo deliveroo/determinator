@@ -41,6 +41,36 @@ module Determinator
       overrides[id.to_s]
     end
 
+    def to_hash
+      {
+        'name'          => name,
+        'seed'          => seed,
+        'slice_type'    => slice_type,
+        'variants'      => variants,
+        'overrides'     => overrides,
+        'target_groups' => target_groups.map(&:to_hash)
+      }
+    end
+
+    def self.from_hash(hash)
+      new(
+        name:          hash['name'],
+        seed:          hash['seed'],
+        slice_type:    hash['slice_type'],
+        variants:      hash['variants'],
+        overrides:     hash['overrides'],
+        target_groups: hash['target_groups'].map(&TargetGroup.method(:from_hash))
+      )
+    end
+
+    def ==(other)
+      to_hash == other.to_hash
+    end
+
+    def inspect
+      "#<Feature #{name}>"
+    end
+
     private
 
     attr_reader :overrides
