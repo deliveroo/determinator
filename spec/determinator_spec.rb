@@ -1,11 +1,9 @@
 require "spec_helper"
 
 describe Determinator do
-  it "has a version number" do
-    expect(Determinator::VERSION).not_to be nil
-  end
+  describe '::VERSION' do
+    subject { described_class::VERSION }
 
-  it "does something useful" do
-    expect(false).to eq(true)
+    it { should match(%r{\A\d+\.\d+\.\d+\z}) }
   end
 end
