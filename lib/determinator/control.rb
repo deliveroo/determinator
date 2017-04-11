@@ -3,8 +3,10 @@ require 'determinator/actor_control'
 
 module Determinator
   class Control
-    def initialize(feature_store:)
-      @feature_store = feature_store
+    attr_reader :retrieval
+
+    def initialize(retrieval:)
+      @retrieval = retrieval
     end
 
     # @return [ActorControl] A helper object removing the need to know id and guid everywhere
@@ -30,14 +32,16 @@ module Determinator
       end
     end
 
-    private
+    def inspect
+      '#<Determinator::Control>'
+    end
 
-    attr_reader :feature_store
+    private
 
     Indicators = Struct.new(:rollout, :variant)
 
     def determinate(name, id:, guid:, constraints:)
-      feature = feature_store.get(name)
+      feature = retrieval.retrieve(name)
       return false unless feature
 
       # Calling method can place constraints on the feature, eg. experiment only
@@ -51,6 +55,8 @@ module Determinator
       return false unless target_group
 
       indicators = indicators_for(feature, id, guid)
+      # This actor isn't described in enough detail to form indicators
+      return false unless indicators
 
       # Actor's indicator has excluded them from the feature
       return false if indicators.rollout >= target_group.rollout
@@ -81,9 +87,7 @@ module Determinator
                          end
       # No identified means not enough info was given by the caller
       # to determine an outcome for this feature
-      if actor_identifier.nil?
-        raise ArgumentError, "Identifier for '#{feature.bucket_type}' type cannot be found from id: #{id}, guid: #{guid}"
-      end
+      return unless actor_identifier
 
       # Cryptographic hash (will have random distribution)
       hash = Digest::MD5.new

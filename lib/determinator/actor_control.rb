@@ -30,6 +30,10 @@ module Determinator
       )
     end
 
+    def inspect
+      "#<Determinator::ActorControl id=#{id.inspect} guid=#{guid.inspect}>"
+    end
+
     private
 
     attr_reader :controller
