@@ -21,7 +21,7 @@ module Determinator
       )
     end
 
-    def show_feature?(name, constraints: {})
+    def feature_flag_on?(name, constraints: {})
       controller.show_feature?(
         name,
         id: id,

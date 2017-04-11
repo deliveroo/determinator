@@ -17,9 +17,9 @@ module Determinator
     # Determines whether a specific feature is on or off for the given actor
     #
     # @return [true,false] Whether the feature is on (true) or off (false) for this actor
-    def show_feature?(name, id: nil, guid: nil, constraints: {})
+    def feature_flag_on?(name, id: nil, guid: nil, constraints: {})
       determinate(name, id: id, guid: guid, constraints: constraints) do |feature|
-        !feature.experiment?
+        feature.feature_flag?
       end
     end
 

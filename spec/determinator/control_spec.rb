@@ -89,7 +89,7 @@ describe Determinator::Control do
 
     context 'when the feature has a different identifier' do
       let(:feature_identifier) { 'another' }
-      let(:let) { 61_820 }
+      let(:not_quite_enough_rollout) { 61_820 }
 
       context 'when the rollout is just enough to reach this actor' do
         let(:rollout) { not_quite_enough_rollout + 1 }
@@ -136,7 +136,7 @@ describe Determinator::Control do
       end
     end
 
-    context 'when the bucket type is fallback', focus: true do
+    context 'when the bucket type is fallback' do
       let(:bucket_type) { :fallback }
 
       context "when an actor id is given" do
@@ -176,8 +176,8 @@ describe Determinator::Control do
   end
 
   # Tests for features
-  describe '#show_feature?' do
-    subject(:method_call) { instance.show_feature?(
+  describe '#feature_flag_on?' do
+    subject(:method_call) { instance.feature_flag_on?(
       feature_name,
       id: id,
       guid: guid,
