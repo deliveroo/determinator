@@ -22,7 +22,7 @@ module Determinator
     end
 
     def feature_flag_on?(name, constraints: {})
-      controller.show_feature?(
+      controller.feature_flag_on?(
         name,
         id: id,
         guid: guid,

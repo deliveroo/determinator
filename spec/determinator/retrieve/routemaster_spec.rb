@@ -4,12 +4,12 @@ describe Determinator::Retrieve::Routemaster do
   let(:instance) { described_class.new(discovery_url: discovery_url) }
   let(:discovery_url) { 'https://florence' }
   let(:routemaster) { double }
-  let(:routemaster_listener) { double }
+  let(:routemaster_app) { double }
   let(:cache_redis) { double }
 
   before do
     allow_any_instance_of(::Routemaster::APIClient).to receive(:discover).and_return(routemaster)
-    allow(::Routemaster::Drain::Caching).to receive(:new).and_return(routemaster_listener)
+    allow(::Routemaster::Drain::Caching).to receive(:new).and_return(routemaster_app)
 
     allow(::Routemaster::Config).to receive(:cache_redis).and_return(cache_redis)
     allow(cache_redis).to receive(:get).with("determinator_index:#{feature_name}").and_return(feature_id)
@@ -23,28 +23,27 @@ describe Determinator::Retrieve::Routemaster do
     let(:routemaster_scope) { double }
     let(:hateoas_response) { Hashie::Mash.new(
       body: {
-        attributes: {
-          name: feature_name,
-          identifier: 'a',
-          bucket_type: 'id',
-          target_groups: [
-            {
-              rollout: 32_768,
-              constraints: {}
-            },{
-              rollout: 1_000,
-              constraints: {
-                type: 'value'
-              }
+        id: feature_id,
+        name: feature_name,
+        identifier: 'a',
+        bucket_type: 'id',
+        target_groups: [
+          {
+            rollout: 32_768,
+            constraints: {}
+          },{
+            rollout: 1_000,
+            constraints: {
+              type: 'value'
             }
-          ],
-          variants: {
-            red: 1,
-            blue: 1
-          },
-          overrides: {
-            '1': 'blue'
           }
+        ],
+        variants: {
+          red: 1,
+          blue: 1
+        },
+        overrides: {
+          '1': 'blue'
         }
       }
     ) }
