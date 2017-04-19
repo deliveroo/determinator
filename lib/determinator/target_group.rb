@@ -19,5 +19,10 @@ module Determinator
       pc = (rollout_percent * 100).to_f.round(1)
       "<#{pc}% of those matching: #{constraints}>"
     end
+
+    def ==(other)
+      return false unless other.is_a?(self.class)
+      other.rollout == rollout && other.constraints == constraints
+    end
   end
 end

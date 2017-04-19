@@ -2,9 +2,15 @@ require 'determinator/version'
 require 'determinator/control'
 require 'determinator/feature'
 require 'determinator/target_group'
+require 'determinator/retrieve/routemaster'
 
 module Determinator
-  def self.configure(initialize_from:, update_using:, cache_using:)
-    
+  def self.configure(retrieval:)
+    @instance = Control.new(retrieval: retrieval)
+  end
+
+  def self.instance
+    raise "No singleton Determinator instance defined" unless @instance
+    @instance
   end
 end

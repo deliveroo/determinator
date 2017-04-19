@@ -1,8 +1,8 @@
 require "spec_helper"
 
 describe Determinator::Control do
-  let(:instance) { described_class.new(feature_store: feature_store) }
-  let(:feature_store) { double }
+  let(:instance) { described_class.new(retrieval: retrieval) }
+  let(:retrieval) { double }
   let(:feature_name) { 'name' }
   let(:feature_identifier) { feature_name }
   let(:feature_constraints) { {} }
@@ -12,13 +12,14 @@ describe Determinator::Control do
   let(:actor_constraints) { {} }
   let(:guid) { 'abc' }
   let(:id) { '123' }
+  let(:bucket_type) { :guid }
   let(:overrides) { {} }
   let(:rollout) { 65_536 }
   # For the default identifier and id this is the lowest rollout percentage
   let(:not_quite_enough_rollout) { 2_024 }
 
   before do
-    allow(feature_store).to receive(:get).with(feature_name).and_return(feature)
+    allow(retrieval).to receive(:retrieve).with(feature_name).and_return(feature)
   end
 
   describe '#for_actor' do
@@ -80,7 +81,7 @@ describe Determinator::Control do
       end
     end
 
-    context "when the rollout is't quite enough to reach this actor" do
+    context "when the rollout isn't quite enough to reach this actor" do
       let(:rollout) { not_quite_enough_rollout }
 
       it { should eq false }
@@ -100,6 +101,58 @@ describe Determinator::Control do
         let(:rollout) { not_quite_enough_rollout }
 
         it { should eq false }
+      end
+    end
+
+    context 'when the bucket type is id' do
+      let(:bucket_type) { :id }
+
+      context "when an actor id is given" do
+        let(:id) { '1' }
+
+        it { should eq responses[:name] }
+      end
+
+      context "when no actor id is given" do
+        let(:id) { nil }
+
+        it { should eq false }
+      end
+    end
+
+    context 'when the bucket type is guid' do
+      let(:bucket_type) { :guid }
+
+      context "when an actor guid is given" do
+        let(:guid) { 'abc' }
+
+        it { should eq responses[:name] }
+      end
+
+      context "when no actor id is given" do
+        let(:guid) { nil }
+
+        it { should eq false }
+      end
+    end
+
+    context 'when the bucket type is fallback' do
+      let(:bucket_type) { :fallback }
+
+      context "when an actor id is given" do
+        let(:id) { '123' }
+
+        it 'should respond as it would with the actor identifier being the id' do
+          should eq responses[:another]
+        end
+      end
+
+      context "when no actor id is given" do
+        let(:id) { nil }
+
+        it 'should respond as it would with the actor identifier being the guid' do
+          should eq responses[:name]
+        end
       end
     end
 
@@ -123,8 +176,8 @@ describe Determinator::Control do
   end
 
   # Tests for features
-  describe '#show_feature?' do
-    subject(:method_call) { instance.show_feature?(
+  describe '#feature_flag_on?' do
+    subject(:method_call) { instance.feature_flag_on?(
       feature_name,
       id: id,
       guid: guid,
@@ -133,6 +186,7 @@ describe Determinator::Control do
     let(:feature) { FactoryGirl.create(:feature,
       name: feature_name,
       identifier: feature_identifier,
+      bucket_type: bucket_type,
       overrides: overrides,
       rollout: rollout,
       constraints: feature_constraints
@@ -158,6 +212,7 @@ describe Determinator::Control do
     let(:feature) { FactoryGirl.create(:experiment,
       name: feature_name,
       identifier: feature_identifier,
+      bucket_type: bucket_type,
       overrides: overrides,
       rollout: rollout,
       constraints: feature_constraints

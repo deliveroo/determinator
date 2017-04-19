@@ -21,13 +21,17 @@ module Determinator
       )
     end
 
-    def show_feature?(name, constraints: {})
-      controller.show_feature?(
+    def feature_flag_on?(name, constraints: {})
+      controller.feature_flag_on?(
         name,
         id: id,
         guid: guid,
         constraints: default_constraints.merge(constraints)
       )
+    end
+
+    def inspect
+      "#<Determinator::ActorControl id=#{id.inspect} guid=#{guid.inspect}>"
     end
 
     private
