@@ -5,8 +5,8 @@ require 'determinator/target_group'
 require 'determinator/retrieve/routemaster'
 
 module Determinator
-  def self.configure(update_using:)
-    @instance = Control.new(retrieval: update_using)
+  def self.configure(retrieval:)
+    @instance = Control.new(retrieval: retrieval)
   end
 
   def self.instance

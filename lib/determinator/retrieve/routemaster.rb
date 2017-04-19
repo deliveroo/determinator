@@ -19,6 +19,8 @@ module Determinator
     class Routemaster
       attr_reader :routemaster_app
 
+      CALLBACK_PATH = (URI.parse(ENV['ROUTEMASTER_CALLBACK_URL']).path rescue '/events').freeze
+
       # @param :discovery_url [String] The bootstrap URL of the instance of Florence which defines Features.
       def initialize(discovery_url:)
         client = ::Routemaster::APIClient.new(
@@ -53,25 +55,11 @@ module Determinator
         nil
       end
 
-      # Returns the path component of the URL that Routemaster will send changes to.
-      #
-      # This is useful for adding the `routemaster_app` rack application to your application's routes file
-      # if not using #configure_rails_router.
-      #
-      #     map(your_instance_of_determinator.retrieval.routemaster_callback_path) do
-      #       your_instance_of_determinator.retrieval.routemaster_app
-      #     end
-      #
-      # @return [String] The path of the URL Routemaster will send event notifications to.
-      def routemaster_callback_path
-        URI.parse(ENV['ROUTEMASTER_CALLBACK_URL']).path
-      end
-
       # Automatically configures the rails router to listen for Features with routemaster
       #
       # @param route_mapper [ActionDispatch::Routing::Mapper] The rails mapper, 'self' within the `routes.draw` block
       def configure_rails_router(route_mapper)
-        route_mapper.mount routemaster_app, at: routemaster_callback_path
+        route_mapper.mount routemaster_app, at: CALLBACK_PATH
       end
 
       def self.index_cache_key(feature_name)
