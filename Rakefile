@@ -15,8 +15,10 @@ namespace :version do
 
     version_file = File.join(__dir__, "lib/determinator/version.rb")
     vfile_contents = File.read(version_file)
-    new_contents = vfile_contents.sub('VERSION = "(.+?)"', %q[VERSION = "#{version.to_s}"])
+    new_contents = vfile_contents.sub(%r{VERSION = "(.+?)"}, %Q[VERSION = "#{version.to_s}"])
 
     File.write(version_file, new_contents)
+    Determinator.send(:remove_const, :VERSION)
+    load version_file
   end
 end

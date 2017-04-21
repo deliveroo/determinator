@@ -1,5 +1,0 @@
-deployment:
-  release:
-    branch: master
-    commands:
-      - bundle exec rake version:bump release
