@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Determinator::Retrieve::TestRetriever do
+describe Determinator::Retrieve::NullRetriever do
   let(:discovery_url) { '' }
 
   subject { described_class.new(discovery_url: discovery_url) }
