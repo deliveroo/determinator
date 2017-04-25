@@ -3,6 +3,7 @@ require 'determinator/control'
 require 'determinator/feature'
 require 'determinator/target_group'
 require 'determinator/retrieve/routemaster'
+require 'determinator/retrieve/test_retriever'
 
 module Determinator
   def self.configure(retrieval:)
