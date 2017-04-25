@@ -1,7 +1,7 @@
 require 'uri'
 require 'routemaster/drain/caching'
 require 'routemaster/responses/hateoas_response'
-require 'determinator/retrieve/routemaster_indexing_middleware'
+require 'determinator/retrieve/routemaster_feature_id_cache_warmer'
 
 module Determinator
   module Retrieve
@@ -24,11 +24,12 @@ module Determinator
       # @param :discovery_url [String] The bootstrap URL of the instance of Florence which defines Features.
       def initialize(discovery_url:)
         client = ::Routemaster::APIClient.new(
-          response_class: ::Routemaster::Responses::HateoasResponse,
-          middlewares: [RoutemasterIndexingMiddleware]
+          response_class: ::Routemaster::Responses::HateoasResponse
         )
         @routemaster = client.discover(discovery_url)
-        @routemaster_app = ::Routemaster::Drain::Caching.new
+        @routemaster_app = ::Routemaster::Drain::Caching.new(
+          siphon_events: { 'features' => RoutemasterFeatureIdCacheWarmer }
+        )
       end
 
       def retrieve(feature_name)
@@ -45,11 +46,11 @@ module Determinator
           target_groups: obj.body.target_groups.map { |tg|
             TargetGroup.new(
               rollout: tg.rollout,
-              constraints: tg.constraints.to_hash
+              constraints: tg.constraints.to_h
             )
           },
-          variants:      obj.body.variants.to_hash,
-          overrides:     obj.body.overrides.to_hash
+          variants:      obj.body.variants.to_h,
+          overrides:     obj.body.overrides.to_h
         )
       rescue ::Routemaster::Errors::ResourceNotFound
         nil
