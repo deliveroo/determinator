@@ -1,7 +1,7 @@
 require 'uri'
 require 'routemaster/drain/caching'
 require 'routemaster/responses/hateoas_response'
-require 'determinator/retrieve/feature_id_cache_warmer'
+require 'determinator/retrieve/routemaster_feature_id_cache_warmer'
 
 module Determinator
   module Retrieve
@@ -28,7 +28,7 @@ module Determinator
         )
         @routemaster = client.discover(discovery_url)
         @routemaster_app = ::Routemaster::Drain::Caching.new(
-          siphon_events: { 'features' => FeatureIdCacheWarmer }
+          siphon_events: { 'features' => RoutemasterFeatureIdCacheWarmer }
         )
       end
 

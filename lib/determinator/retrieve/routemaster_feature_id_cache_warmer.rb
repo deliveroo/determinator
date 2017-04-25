@@ -1,6 +1,6 @@
 module Determinator
   module Retrieve
-    class FeatureIdCacheWarmer
+    class RoutemasterFeatureIdCacheWarmer
       def initialize(payload)
         @payload = payload
       end

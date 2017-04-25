@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Determinator::Retrieve::FeatureIdCacheWarmer do
+describe Determinator::Retrieve::RoutemasterFeatureIdCacheWarmer do
   let(:client) { double('client') }
   let(:redis) { double('redis') }
 
