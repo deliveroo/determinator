@@ -50,7 +50,9 @@ module Determinator
             )
           },
           variants:      obj.body.variants.to_h,
-          overrides:     obj.body.overrides.to_h
+          overrides:     obj.body.overrides.each_with_object({}) { |override, hash|
+            hash[override.user_id] = override.variant
+          }
         )
       rescue ::Routemaster::Errors::ResourceNotFound
         nil

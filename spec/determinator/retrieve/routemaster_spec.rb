@@ -19,6 +19,7 @@ describe Determinator::Retrieve::Routemaster do
     subject(:method_call) { instance.retrieve(feature_name) }
     let(:feature_name) { 'my_feature' }
     let(:feature_id) { 1 }
+    let(:override) { double(user_id: rand(100), variant: 'blue') }
 
     let(:routemaster_scope) { double }
     let(:hateoas_response) { Hashie::Mash.new(
@@ -42,9 +43,7 @@ describe Determinator::Retrieve::Routemaster do
           red: 1,
           blue: 1
         },
-        overrides: {
-          '1': 'blue'
-        }
+        overrides: [override]
       }
     ) }
 
@@ -69,7 +68,7 @@ describe Determinator::Retrieve::Routemaster do
       its(:identifier) { should eq 'a' }
       its(:bucket_type) { should eq :id }
       its(:variants) { should eq('red' => 1, 'blue' => 1) }
-      its(:overrides) { should eq('1' => 'blue')}
+      its(:overrides) { should eq(override.user_id.to_s => override.variant)}
       its(:target_groups) { should eq [
         Determinator::TargetGroup.new(
           rollout: 32_768,
