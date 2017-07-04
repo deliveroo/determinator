@@ -18,7 +18,7 @@ Bear in mind that, because routemaster depends on background workers to populate
 
 ### `app/controllers/index_controller.rb`
 
-An example of how Determinator can be used for feature flags.
+An example of how Determinator can be used for feature flags and experiments.
 
 ### `app/controllers/application_controller.rb`
 
