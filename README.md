@@ -29,12 +29,12 @@ Feature flags and Experiments can be configured to have string based constraints
 
 Constraints must be strings, what matches and doesn't is configurable after-the-fact within Florence.
 
-```
+```ruby
 # Constraints
 variant = determinator.which_variant(
   :my_experiment_name,
   constraints: {
-    country_of_first_order: Orders.first.country.tld,
+    country_of_first_order: current_user.orders.first.country.tld,
   }
 )
 ```
