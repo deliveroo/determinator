@@ -4,23 +4,42 @@ A gem that works with [Florence](https://github.com/deliveroo/actor-tracking) to
 
 ![Determinator](docs/img/determinator.jpg)
 
-## Installation
+## Usage
 
-Add this line to your application's Gemfile:
+Once [set up](#installation), determinator can be used to determine whether a **feature flag** or **experiment** is on or off for the current user and, for experiments, which **variant** they should see.
 
 ```ruby
-gem 'determinator'
+# Feature flags
+if determinator.feature_flag_on?(:my_feature_name)
+  # Show the feature
+end
+
+# Experiments
+case determinator.which_variant(:my_experiment_name)
+when 'control'
+  # Do nothing different
+when 'sloths'
+  # Show some sloth pictures
+when 'velociraptors'
+  # RUN!
+end
 ```
 
-And then execute:
+Feature flags and Experiments can be configured to have string based constraints. When the strings required for the experiment do not match, the user will _never_ see the flag or the experiment, when they match, then the rollout specified by the feature will be applied.
 
-    $ bundle
+Constraints must be strings, what matches and doesn't is configurable after-the-fact within Florence.
 
-Or install it yourself as:
+```
+# Constraints
+variant = determinator.which_variant(
+  :my_experiment_name,
+  constraints: {
+    country_of_first_order: Orders.first.country.tld,
+  }
+)
+```
 
-    $ gem install determinator
-
-## Usage
+## Installation
 
 Check the example Rails app in `examples` for more information on how to make use of this gem.
 
