@@ -7,6 +7,7 @@ module Determinator
 
     def initialize(retrieval:)
       @retrieval = retrieval
+      @callbacks = []
     end
 
     # @return [ActorControl] A helper object removing the need to know id and guid everywhere
@@ -30,6 +31,10 @@ module Determinator
       determinate(name, id: id, guid: guid, constraints: constraints) do |feature|
         feature.experiment?
       end
+    end
+
+    def on_variant_determination(&block)
+      @callbacks << block
     end
 
     def inspect
@@ -65,7 +70,9 @@ module Determinator
       # they have been rolled out to.
       return true unless feature.experiment?
 
-      variant_for(feature, indicators.variant)
+      variant_for(feature, indicators.variant).tap do |variant|
+        exec_callbacks(name, id, guid, variant)
+      end
     end
 
     def choose_target_group(feature, constraints)
@@ -114,6 +121,12 @@ module Determinator
       end
 
       raise ArgumentError, "A variant should have been found by this point, there is a bug in the code."
+    end
+
+    def exec_callbacks(name, id, guid, variant)
+      @callbacks.each do |callback|
+        callback.call(name, id, guid, variant)
+      end
     end
   end
 end

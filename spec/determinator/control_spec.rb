@@ -225,5 +225,24 @@ describe Determinator::Control do
 
       it { should eq false }
     end
+
+    context 'when a callback has been specified', focus: true do
+      before do
+        instance.on_variant_determination do |*args|
+          @callback_args = args
+        end
+      end
+
+      # For the defaults above
+      let(:expected_variant) { 'b' }
+
+      it_behaves_like 'a feature with identifier responses', name: 'b', another: 'a'
+
+      it 'should execute the callback' do
+        method_call
+
+        expect(@callback_args).to eq([feature_name, id, guid, expected_variant])
+      end
+    end
   end
 end
