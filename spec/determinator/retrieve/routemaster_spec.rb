@@ -31,12 +31,12 @@ describe Determinator::Retrieve::Routemaster do
         target_groups: [
           {
             rollout: 32_768,
-            constraints: {}
+            constraints: []
           },{
             rollout: 1_000,
-            constraints: {
+            constraints: [{
               type: 'value'
-            }
+            }]
           }
         ],
         variants: {

@@ -46,7 +46,7 @@ module Determinator
           target_groups: obj.body.target_groups.map { |tg|
             TargetGroup.new(
               rollout: tg.rollout,
-              constraints: tg.constraints.to_h
+              constraints: tg.constraints.first.to_h
             )
           },
           variants:      obj.body.variants.to_h,
