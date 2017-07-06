@@ -43,6 +43,7 @@ module Determinator
           name:          obj.body.name,
           identifier:    obj.body.identifier,
           bucket_type:   obj.body.bucket_type,
+          active:        obj.body.active,
           target_groups: obj.body.target_groups.map { |tg|
             TargetGroup.new(
               rollout: tg.rollout,

@@ -28,6 +28,7 @@ describe Determinator::Retrieve::Routemaster do
         name: feature_name,
         identifier: 'a',
         bucket_type: 'id',
+        active: true,
         target_groups: [
           {
             rollout: 32_768,
