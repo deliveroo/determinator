@@ -32,4 +32,20 @@ describe Determinator::Feature do
       it { should eq true }
     end
   end
+
+  describe '#active?' do
+    subject { feature.active? }
+
+    context 'when feature is active' do
+      let(:feature) { FactoryGirl.create(:feature, :active) }
+
+      it { should be_truthy }
+    end
+
+    context 'when feature is inactive' do
+      let(:feature) { FactoryGirl.create(:feature) }
+
+      it { should be_falsey }
+    end
+  end
 end

@@ -15,6 +15,7 @@ describe Determinator::Control do
   let(:bucket_type) { :guid }
   let(:overrides) { {} }
   let(:rollout) { 65_536 }
+  let(:active) { true }
   # For the default identifier and id this is the lowest rollout percentage
   let(:not_quite_enough_rollout) { 2_024 }
 
@@ -175,6 +176,12 @@ describe Determinator::Control do
     end
   end
 
+  shared_examples 'feature is inactive' do
+    let(:active) { false }
+
+    it { should eq(false) }
+  end
+
   # Tests for features
   describe '#feature_flag_on?' do
     subject(:method_call) { instance.feature_flag_on?(
@@ -189,7 +196,8 @@ describe Determinator::Control do
       bucket_type: bucket_type,
       overrides: overrides,
       rollout: rollout,
-      constraints: feature_constraints
+      constraints: feature_constraints,
+      active: active
     ) }
 
     it_behaves_like 'a feature with identifier responses', name: true, another: true
@@ -198,6 +206,10 @@ describe Determinator::Control do
       let(:feature) { FactoryGirl.create(:experiment, :full_rollout) }
 
       it { should eq false }
+    end
+
+    context 'when the feature is inactive' do
+      it_behaves_like 'feature is inactive'
     end
   end
 
@@ -215,7 +227,8 @@ describe Determinator::Control do
       bucket_type: bucket_type,
       overrides: overrides,
       rollout: rollout,
-      constraints: feature_constraints
+      constraints: feature_constraints,
+      active: active
     ) }
 
     it_behaves_like 'a feature with identifier responses', name: 'b', another: 'a'
@@ -224,6 +237,10 @@ describe Determinator::Control do
       let(:feature) { FactoryGirl.create(:feature, :full_rollout) }
 
       it { should eq false }
+    end
+
+    context 'when the feature is inactive' do
+      it_behaves_like 'feature is inactive'
     end
   end
 end
