@@ -3,15 +3,16 @@ module Determinator
   #
   # @attr_reader [nil,Hash<String,Integer>] variants The variants for this experiment, with the name of the variant as the key and the weight as the value. Will be nil for non-experiments.
   class Feature
-    attr_reader :name, :identifier, :bucket_type, :variants, :target_groups
+    attr_reader :name, :identifier, :bucket_type, :variants, :target_groups, :winning_variant
 
     BUCKET_TYPES = %i(id guid fallback)
 
-    def initialize(name:, identifier:, bucket_type:, target_groups:, variants: {}, overrides: {})
+    def initialize(name:, identifier:, bucket_type:, target_groups:, variants: {}, overrides: {}, winning_variant: nil)
       @name = name.to_s
       @identifier = identifier.to_s
       @variants = variants
       @target_groups = target_groups
+      @winning_variant = winning_variant
 
       @bucket_type = bucket_type.to_sym
       raise ArgumentError, "Unknown bucket type: #{bucket_type}" unless BUCKET_TYPES.include?(@bucket_type)

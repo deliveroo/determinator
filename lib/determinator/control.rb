@@ -101,6 +101,8 @@ module Determinator
     end
 
     def variant_for(feature, indicator)
+      return feature.winning_variant if feature.winning_variant
+
       # Scale up the weights so the variants fit within the possible space for the variant indicator
       variant_weight_total = feature.variants.values.reduce(:+)
       scale_factor = 65_535 / variant_weight_total.to_f
