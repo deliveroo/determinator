@@ -50,6 +50,8 @@ module Determinator
       # Overrides take precedence
       return feature.override_value_for(id) if feature.overridden_for?(id)
 
+      return false unless feature.active?
+
       target_group = choose_target_group(feature, constraints)
       # Given constraints have excluded this actor from this experiment
       return false unless target_group

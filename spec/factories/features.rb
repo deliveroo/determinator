@@ -3,6 +3,7 @@ FactoryGirl.define do
     sequence :name
     identifier { name }
     bucket_type :guid
+    active false
 
     # Not an experiment by default
     variants Hash.new
@@ -27,6 +28,10 @@ FactoryGirl.define do
 
     trait :with_overrides do
       overrides Hash[[['123', false]]]
+    end
+
+    trait :active do
+      active true
     end
 
     factory :experiment, class: Determinator::Feature do
