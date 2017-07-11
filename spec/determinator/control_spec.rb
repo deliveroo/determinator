@@ -18,6 +18,7 @@ describe Determinator::Control do
   let(:active) { true }
   # For the default identifier and id this is the lowest rollout percentage
   let(:not_quite_enough_rollout) { 2_024 }
+  let(:winning_variant) { 'enabled' }
 
   before do
     allow(retrieval).to receive(:retrieve).with(feature_name).and_return(feature)
@@ -241,6 +242,32 @@ describe Determinator::Control do
 
     context 'when the feature is inactive' do
       it_behaves_like 'feature is inactive'
+    end
+
+    context 'when a winning variant is set' do
+      let(:winning_variant) { 'enabled' }
+
+      let(:feature) { FactoryGirl.create(:experiment,
+        name: feature_name,
+        identifier: feature_identifier,
+        bucket_type: bucket_type,
+        overrides: overrides,
+        rollout: rollout,
+        constraints: feature_constraints,
+        winning_variant: winning_variant,
+        active: true,
+      ) }
+
+      subject(:method_call) { instance.which_variant(
+        feature_name,
+        id: id,
+        guid: guid,
+        constraints: actor_constraints
+      ) }
+
+      it 'is the winning variant' do
+        expect(subject).to eq(winning_variant)
+      end
     end
   end
 end
