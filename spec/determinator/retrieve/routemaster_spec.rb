@@ -82,6 +82,16 @@ describe Determinator::Retrieve::Routemaster do
           }
         )
       ] }
+
+      context "when given a cache retriver" do
+        let(:instance) { described_class.new(discovery_url: discovery_url, retrieval_cache: cache_double) }
+        let(:cache_double){ double }
+
+        it "should call fetch, returning a routemaster object " do
+          expect(cache_double).to receive(:fetch) { |&block| block.call }
+          expect(subject).to be_kind_of(Determinator::Feature)
+        end
+      end
     end
 
     context "when the requested feature isn't present in Florence" do
