@@ -39,7 +39,7 @@ module Determinator
           key = self.class.index_cache_key(feature_name)
           feature_id = ::Routemaster::Config.cache_redis.get(key)
           return unless feature_id
-          obj = @actor_service.feature.show(feature_id)
+          @actor_service.feature.show(feature_id)
         end
       rescue ::Routemaster::Errors::ResourceNotFound
         nil
