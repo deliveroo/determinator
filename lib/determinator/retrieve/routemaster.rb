@@ -2,6 +2,7 @@ require 'uri'
 require 'routemaster/drain/caching'
 require 'routemaster/responses/hateoas_response'
 require 'determinator/retrieve/routemaster_feature_id_cache_warmer'
+require 'determinator/retrieve/null_cache'
 
 module Determinator
   module Retrieve
@@ -22,23 +23,52 @@ module Determinator
       CALLBACK_PATH = (URI.parse(ENV['ROUTEMASTER_CALLBACK_URL']).path rescue '/events').freeze
 
       # @param :discovery_url [String] The bootstrap URL of the instance of Florence which defines Features.
-      def initialize(discovery_url:)
+      def initialize(discovery_url:, retrieval_cache: NullCache.new)
         client = ::Routemaster::APIClient.new(
           response_class: ::Routemaster::Responses::HateoasResponse
         )
-        @routemaster = client.discover(discovery_url)
+        @retrieval_cache = retrieval_cache
+        @actor_service = client.discover(discovery_url)
         @routemaster_app = ::Routemaster::Drain::Caching.new(
           siphon_events: { 'features' => RoutemasterFeatureIdCacheWarmer }
         )
       end
 
       def retrieve(feature_name)
-        key = self.class.index_cache_key(feature_name)
-        feature_id = ::Routemaster::Config.cache_redis.get(key)
-        return unless feature_id
+        cached_feature_lookup(feature_name) do
+          key = self.class.index_cache_key(feature_name)
+          feature_id = ::Routemaster::Config.cache_redis.get(key)
+          return unless feature_id
+          @actor_service.feature.show(feature_id)
+        end
+      rescue ::Routemaster::Errors::ResourceNotFound
+        nil
+      end
 
-        obj = @routemaster.feature.show(feature_id)
+      # Automatically configures the rails router to listen for Features with routemaster
+      #
+      # @param route_mapper [ActionDispatch::Routing::Mapper] The rails mapper, 'self' within the `routes.draw` block
+      def configure_rails_router(route_mapper)
+        route_mapper.mount routemaster_app, at: CALLBACK_PATH
+      end
 
+      def self.index_cache_key(feature_name)
+        "determinator_index:#{feature_name}"
+      end
+
+      def self.lookup_cache_key(feature_name)
+        "determinator_cache:#{feature_name}"
+      end
+
+      private
+
+      def cached_feature_lookup(feature_name)
+        build_feature_from_api_response(
+          @retrieval_cache.fetch(self.class.lookup_cache_key(feature_name)){ yield }
+        )
+      end
+
+      def build_feature_from_api_response(obj)
         Feature.new(
           name:          obj.body.name,
           identifier:    obj.body.identifier,
@@ -56,19 +86,6 @@ module Determinator
           },
           winning_variant: obj.body.winning_variant,
         )
-      rescue ::Routemaster::Errors::ResourceNotFound
-        nil
-      end
-
-      # Automatically configures the rails router to listen for Features with routemaster
-      #
-      # @param route_mapper [ActionDispatch::Routing::Mapper] The rails mapper, 'self' within the `routes.draw` block
-      def configure_rails_router(route_mapper)
-        route_mapper.mount routemaster_app, at: CALLBACK_PATH
-      end
-
-      def self.index_cache_key(feature_name)
-        "determinator_index:#{feature_name}"
       end
     end
   end
