@@ -1,7 +1,6 @@
 require 'uri'
 require 'routemaster/drain/caching'
 require 'routemaster/responses/hateoas_response'
-require 'determinator/retrieve/routemaster_feature_id_cache_warmer'
 require 'determinator/retrieve/null_cache'
 
 module Determinator
@@ -11,12 +10,8 @@ module Determinator
     # To use this correctly you will need the following environment variables set to appropriate values
     # for your instance of Routemaster:
     #
-    # ROUTEMASTER_DRAIN_TOKENS
-    # ROUTEMASTER_DRAIN_REDIS
     # ROUTEMASTER_CACHE_REDIS
     # ROUTEMASTER_CACHE_AUTH
-    # ROUTEMASTER_QUEUE_NAME
-    # ROUTEMASTER_CALLBACK_URL
     class Routemaster
       attr_reader :routemaster_app
 
@@ -29,16 +24,11 @@ module Determinator
         )
         @retrieval_cache = retrieval_cache
         @actor_service = client.discover(discovery_url)
-        @routemaster_app = ::Routemaster::Drain::Caching.new(
-          siphon_events: { 'features' => RoutemasterFeatureIdCacheWarmer }
-        )
+
       end
 
-      def retrieve(feature_name)
-        cached_feature_lookup(feature_name) do
-          key = self.class.index_cache_key(feature_name)
-          feature_id = ::Routemaster::Config.cache_redis.get(key)
-          return unless feature_id
+      def retrieve(feature_id)
+        cached_feature_lookup(feature_id) do
           @actor_service.feature.show(feature_id)
         end
       rescue ::Routemaster::Errors::ResourceNotFound
@@ -50,6 +40,10 @@ module Determinator
       # @param route_mapper [ActionDispatch::Routing::Mapper] The rails mapper, 'self' within the `routes.draw` block
       def configure_rails_router(route_mapper)
         route_mapper.mount routemaster_app, at: CALLBACK_PATH
+      end
+
+      def routemaster_app
+        @routemaster_app ||= ::Routemaster::Drain::Caching.new
       end
 
       def self.index_cache_key(feature_name)

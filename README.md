@@ -41,7 +41,22 @@ variant = determinator.which_variant(
 
 ## Installation
 
+Determinator requires your application to be subscribed to the a `features` topic via Routemaster.
+
+The drain must expire the any routemaster cache on receipt of events, `Routemaster::Drain::CacheBusting.new` or better.
+
 Check the example Rails app in `examples` for more information on how to make use of this gem.
+
+```
+require 'determinator/retrieve/routemaster'
+
+Determinator.configure(
+  retrieval: Determinator::Retrieve::Routemaster.new(
+    discovery_url: 'https://florence.dev/'
+    retrieval_cache: ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
+  )
+)
+```
 
 ## Contributing
 
@@ -52,4 +67,3 @@ Any PR should include a new section at the top of the `CHANGELOG.md` (if it does
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-

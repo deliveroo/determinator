@@ -14,4 +14,3 @@ FactoryGirl.define do
 end
 
 FactoryGirl.find_definitions
-

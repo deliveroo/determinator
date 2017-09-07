@@ -1,6 +1,5 @@
+require 'routemaster/drain/cache_busting'
 Rails.application.routes.draw do
   root to: 'index#show'
-
-  # DETERMINATOR: Make sure the routemaster routes are mapped to the containing app.
-  Determinator.instance.retrieval.configure_rails_router(self)
+  mount Routemaster::Drain::CacheBusting.new, at: ENV.fetch('ROUTEMASTER_CALLBACK_URL')
 end

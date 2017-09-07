@@ -8,13 +8,15 @@ This example Rails app has been configured so that Determinator is correctly con
 
 This file sets up the singleton Determinator instance for the application.
 
+### `config/initializers/routemaster.rb`
+
+Uses Routemaster::Client to subscribe to the `features` topic, with a calback url matching what's set up in the routes file
+
 ### `config/routes.rb`
 
-Using Determinator with Routemaster means that you must expose an endpoint to be informed of changes to Features. Determinator makes it easy to set this up with the `#configure_rails_router` helper method.
+Sets up a simple routemaster drain endpoint, using the `CacheBusting`. Other Drains are available with additional features
 
-### `Procfile`
-
-Bear in mind that, because routemaster depends on background workers to populate the cache, Sidekiq (or Resque) must be running alongside the app.
+https://github.com/deliveroo/routemaster-drain
 
 ### `app/controllers/index_controller.rb`
 
@@ -29,7 +31,3 @@ The `determinator` method memoizes the instance of the `ActorControl` helper cla
 ### `config/application.rb`
 
 Ensure you've required the job runner backend appropriate for your set up. Routemaster Drain currently supports Sidekiq and Resque.
-
-### `config/sidekiq.yml`
-
-This example uses Sidekiq as the background processor, ensure you've set it up correctly for notifications to cache in the background.
