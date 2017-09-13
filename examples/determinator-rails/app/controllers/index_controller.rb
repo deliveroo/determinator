@@ -7,10 +7,8 @@ class IndexController < ApplicationController
       # TODO: Track that this user saw a variant of this experiment
     end
 
-    message = [
-      is_colloquial ? "hi world" : "hello world",
-      emoji
-    ].compact.join(" ")
+    message = is_colloquial ? "hi world" : "hello world"
+    message << ' ' + emoji if emoji
 
     render json: { welcome: message }
   end
