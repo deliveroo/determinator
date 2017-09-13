@@ -35,7 +35,7 @@ describe RSpec::Determinator, :determinator_support do
       forced_determination(:my_experiment, 'outcome', only_for: { property: 'correct' })
       let(:constraints) { { property: 'correct', extra: 'also present' } }
 
-      it { should eq 'outcome' }  
+      it { should eq 'outcome' }
     end
 
     context 'when forcing more than one matching determination' do
@@ -44,7 +44,7 @@ describe RSpec::Determinator, :determinator_support do
 
       let(:constraints) { { property: 'correct', extra: 'also present' } }
 
-      it { should eq 'first outcome' }  
+      it { should eq 'first outcome' }
     end
   end
 end
