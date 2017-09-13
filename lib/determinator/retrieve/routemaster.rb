@@ -68,18 +68,48 @@ module Determinator
           identifier:    obj.body.identifier,
           bucket_type:   obj.body.bucket_type,
           active:        obj.body.active,
-          target_groups: obj.body.target_groups.map { |tg|
-            TargetGroup.new(
-              rollout: tg.rollout,
-              constraints: tg.constraints.first.to_h
-            )
-          },
+          target_groups: target_groups_attribute(obj.body.target_groups),
           variants:      obj.body.variants.to_h,
-          overrides:     obj.body.overrides.each_with_object({}) { |override, hash|
-            hash[override.user_id] = override.variant
-          },
+          overrides:     overrides_attribute(obj.body.overrides),
           winning_variant: obj.body.winning_variant,
         )
+      end
+
+      def target_groups_attribute(target_groups)
+        target_groups.map do |tg|
+          TargetGroup.new(
+            rollout: tg.rollout,
+            constraints: constraints_attribute(tg.constraints)
+          )
+        end
+      end
+
+      def constraints_attribute(constraints)
+        # TODO when FLO-3 closed: no need for legacy guard
+        return legacy_constraints_attribute(constraints) unless constraints.respond_to?(:each_pair)
+        constraints
+      end
+
+      def legacy_constraints_attribute(constraints)
+        constraints.each_with_object({}) do |constraint, h|
+          if h[constraint.scope]
+            h[constraint.scope] = [*h[constraint.scope], constraint.identifier]
+          else
+            h[constraint.scope] = constraint.identifier
+          end
+        end
+      end
+
+      def overrides_attribute(overrides)
+        # TODO when FLO-3 closed: no need for legacy guard
+        return legacy_overrides_attribute(overrides) unless overrides.respond_to?(:each_pair)
+        overrides
+      end
+
+      def legacy_overrides_attribute(overrides)
+        overrides.each_with_object({}) do |override, h|
+          h[override[:user_id]] = override[:variant]
+        end
       end
     end
   end
