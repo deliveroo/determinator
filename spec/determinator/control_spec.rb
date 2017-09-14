@@ -9,7 +9,7 @@ describe Determinator::Control do
   let(:feature) { nil }
 
   # Defaults
-  let(:actor_constraints) { {} }
+  let(:actor_properties) { {} }
   let(:guid) { 'abc' }
   let(:id) { '123' }
   let(:bucket_type) { :guid }
@@ -30,12 +30,12 @@ describe Determinator::Control do
         instance,
         id: '1',
         guid: '2',
-        default_constraints: { c: '3' }
+        default_properties: { c: '3' }
       )
       instance.for_actor(
         id: '1',
         guid: '2',
-        default_constraints: { c: '3' }
+        default_properties: { c: '3' }
       )
     end
 
@@ -44,27 +44,27 @@ describe Determinator::Control do
         instance,
         id: nil,
         guid: nil,
-        default_constraints: {}
+        default_properties: {}
       )
       instance.for_actor
     end
   end
 
-  shared_examples 'for various actor constraints' do |match_value|
-    context "when the actor constraints do match" do
-      let(:actor_constraints) { { a: '1' } }
+  shared_examples 'for various actor properties' do |match_value|
+    context "when the actor properties do match" do
+      let(:actor_properties) { { a: '1' } }
 
       it { should eq match_value }
     end
 
-    context "when the actor constraints don't match" do
-      let(:actor_constraints) { { a: '2' } }
+    context "when the actor properties don't match" do
+      let(:actor_properties) { { a: '2' } }
 
       it { should eq false }
     end
 
-    context "when the actor constraints coincide" do
-      let(:actor_constraints) { { a: ['1', '3'] } }
+    context "when the actor properties coincide" do
+      let(:actor_properties) { { a: ['1', '3'] } }
 
       it { should eq match_value }
     end
@@ -161,13 +161,13 @@ describe Determinator::Control do
     context "when the feature has one target group with one constraint" do
       let(:feature_constraints) { { a: '1' } }
 
-      include_examples 'for various actor constraints', responses[:name]
+      include_examples 'for various actor properties', responses[:name]
     end
 
     context "when the feature has one target group with multiple constraints in one scope" do
       let(:feature_constraints) { { a: ['1', '4'] } }
 
-      include_examples 'for various actor constraints', responses[:name]
+      include_examples 'for various actor properties', responses[:name]
     end
 
     context "when the requested feature doesn't exist" do
@@ -189,7 +189,7 @@ describe Determinator::Control do
       feature_name,
       id: id,
       guid: guid,
-      constraints: actor_constraints
+      properties: actor_properties
     ) }
     let(:feature) { FactoryGirl.create(:feature,
       name: feature_name,
@@ -220,7 +220,7 @@ describe Determinator::Control do
       feature_name,
       id: id,
       guid: guid,
-      constraints: actor_constraints
+      properties: actor_properties
     ) }
     let(:feature) { FactoryGirl.create(:experiment,
       name: feature_name,
@@ -262,7 +262,7 @@ describe Determinator::Control do
         feature_name,
         id: id,
         guid: guid,
-        constraints: actor_constraints
+        properties: actor_properties
       ) }
 
       it 'is the winning variant' do

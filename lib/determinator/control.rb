@@ -10,15 +10,15 @@ module Determinator
     end
 
     # @return [ActorControl] A helper object removing the need to know id and guid everywhere
-    def for_actor(id: nil, guid: nil, default_constraints: {})
-      ActorControl.new(self, id: id, guid: guid, default_constraints: default_constraints)
+    def for_actor(id: nil, guid: nil, default_properties: {})
+      ActorControl.new(self, id: id, guid: guid, default_properties: default_properties)
     end
 
     # Determines whether a specific feature is on or off for the given actor
     #
     # @return [true,false] Whether the feature is on (true) or off (false) for this actor
-    def feature_flag_on?(name, id: nil, guid: nil, constraints: {})
-      determinate(name, id: id, guid: guid, constraints: constraints) do |feature|
+    def feature_flag_on?(name, id: nil, guid: nil, properties: {})
+      determinate(name, id: id, guid: guid, properties: properties) do |feature|
         feature.feature_flag?
       end
     end
@@ -26,8 +26,8 @@ module Determinator
     # Determines what an actor should see for a specific experiment
     #
     # @return [false,String] Returns false, if the actor is not in this experiment, or otherwise the variant name.
-    def which_variant(name, id: nil, guid: nil, constraints: {})
-      determinate(name, id: id, guid: guid, constraints: constraints) do |feature|
+    def which_variant(name, id: nil, guid: nil, properties: {})
+      determinate(name, id: id, guid: guid, properties: properties) do |feature|
         feature.experiment?
       end
     end
@@ -40,7 +40,7 @@ module Determinator
 
     Indicators = Struct.new(:rollout, :variant)
 
-    def determinate(name, id:, guid:, constraints:)
+    def determinate(name, id:, guid:, properties:)
       feature = retrieval.retrieve(name)
       return false unless feature
 
@@ -52,7 +52,7 @@ module Determinator
 
       return false unless feature.active?
 
-      target_group = choose_target_group(feature, constraints)
+      target_group = choose_target_group(feature, properties)
       # Given constraints have excluded this actor from this experiment
       return false unless target_group
 
@@ -70,10 +70,10 @@ module Determinator
       variant_for(feature, indicators.variant)
     end
 
-    def choose_target_group(feature, constraints)
+    def choose_target_group(feature, properties)
       feature.target_groups.select { |tg|
         tg.constraints.reduce(true) do |fit, (scope, *required)|
-          present = [*constraints[scope]]
+          present = [*properties[scope]]
           fit && (required.flatten & present.flatten).any?
         end
       # Must choose target group deterministically, if more than one match
