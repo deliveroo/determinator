@@ -30,5 +30,21 @@ describe RSpec::Determinator, :determinator_support do
 
       it { should eq false }
     end
+
+    context 'when forcing a determination for actors with specific properties that match enough' do
+      forced_determination(:my_experiment, 'outcome', only_for: { property: 'correct' })
+      let(:constraints) { { property: 'correct', extra: 'also present' } }
+
+      it { should eq 'outcome' }  
+    end
+
+    context 'when forcing more than one matching determination' do
+      forced_determination(:my_experiment, 'first outcome', only_for: { property: 'correct' })
+      forced_determination(:my_experiment, 'second outcome', only_for: { extra: 'also present' })
+
+      let(:constraints) { { property: 'correct', extra: 'also present' } }
+
+      it { should eq 'first outcome' }  
+    end
   end
 end

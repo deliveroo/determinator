@@ -36,11 +36,22 @@ module RSpec
         constraints[:id] = id if id
         constraints[:guid] = guid if guid
 
-        return false unless @mocked_results[name.to_s].has_key?(constraints)
-        @mocked_results[name.to_s][constraints]
+        outcome_for_feature_given_properties(name.to_s, constraints)
       end
       alias_method :feature_flag_on?, :fake_determinate
       alias_method :which_variant, :fake_determinate
+
+      private
+
+      def outcome_for_feature_given_properties(feature_name, requirements)
+        req_array = requirements.to_a
+
+        _, forced = @mocked_results[feature_name].find do |given, outcome|
+          (given.to_a - req_array).empty?
+        end
+
+        forced || false
+      end
     end
   end
 end
