@@ -32,11 +32,11 @@ module RSpec
         @mocked_results[name.to_s][only_for] = result
       end
 
-      def fake_determinate(name, id: nil, guid: nil, constraints: {})
-        constraints[:id] = id if id
-        constraints[:guid] = guid if guid
+      def fake_determinate(name, id: nil, guid: nil, properties: {})
+        properties[:id] = id if id
+        properties[:guid] = guid if guid
 
-        outcome_for_feature_given_properties(name.to_s, constraints)
+        outcome_for_feature_given_properties(name.to_s, properties)
       end
       alias_method :feature_flag_on?, :fake_determinate
       alias_method :which_variant, :fake_determinate

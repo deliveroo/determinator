@@ -5,28 +5,31 @@ module Determinator
   class ActorControl
     attr_reader :id, :guid, :default_constraints
 
-    def initialize(controller, id: nil, guid: nil, default_constraints: {})
+    # @see Determinator::Control#for_actor
+    def initialize(controller, id: nil, guid: nil, default_properties: {})
       @id = id
       @guid = guid
-      @default_constraints = default_constraints
+      @default_properties = default_properties
       @controller = controller
     end
 
-    def which_variant(name, constraints: {})
+    # @see Determinator::Control#which_variant
+    def which_variant(name, properties: {})
       controller.which_variant(
         name,
         id: id,
         guid: guid,
-        constraints: default_constraints.merge(constraints)
+        properties: default_properties.merge(properties)
       )
     end
 
-    def feature_flag_on?(name, constraints: {})
+    # @see Determinator::Control#feature_flag_on?
+    def feature_flag_on?(name, properties: {})
       controller.feature_flag_on?(
         name,
         id: id,
         guid: guid,
-        constraints: default_constraints.merge(constraints)
+        properties: default_properties.merge(properties)
       )
     end
 
