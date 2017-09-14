@@ -9,6 +9,13 @@ module Determinator
       @retrieval = retrieval
     end
 
+    # Creates a new determinator instance which assumes the actor id, guid and properties given
+    # are always specified. This is useful for within a before filter in a webserver, for example,
+    # so that the determinator instance made available has the logged-in user's credentials prefilled.
+    #
+    # @param :id [#to_s] The ID of the actor being specified
+    # @param :guid [#to_s] The Anonymous ID of the actor being specified
+    # @param :default_properties [Hash<Symbol,String>] The default properties for the determinator being created
     # @return [ActorControl] A helper object removing the need to know id and guid everywhere
     def for_actor(id: nil, guid: nil, default_properties: {})
       ActorControl.new(self, id: id, guid: guid, default_properties: default_properties)
@@ -16,6 +23,10 @@ module Determinator
 
     # Determines whether a specific feature is on or off for the given actor
     #
+    # @param name [#to_s] The name of the feature flag being checked
+    # @param :id [#to_s] The id of the actor being determinated for
+    # @param :guid [#to_s] The Anonymous id of the actor being determinated for
+    # @param :properties [Hash<Symbol,String>] The properties of this actor which will be used for including this actor or not
     # @return [true,false] Whether the feature is on (true) or off (false) for this actor
     def feature_flag_on?(name, id: nil, guid: nil, properties: {})
       determinate(name, id: id, guid: guid, properties: properties) do |feature|
@@ -25,6 +36,10 @@ module Determinator
 
     # Determines what an actor should see for a specific experiment
     #
+    # @param name [#to_s] The name of the experiment being checked
+    # @param :id [#to_s] The id of the actor being determinated for
+    # @param :guid [#to_s] The Anonymous id of the actor being determinated for
+    # @param :properties [Hash<Symbol,String>] The properties of this actor which will be used for including this actor or not
     # @return [false,String] Returns false, if the actor is not in this experiment, or otherwise the variant name.
     def which_variant(name, id: nil, guid: nil, properties: {})
       determinate(name, id: id, guid: guid, properties: properties) do |feature|

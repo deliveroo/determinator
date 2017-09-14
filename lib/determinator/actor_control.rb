@@ -5,6 +5,7 @@ module Determinator
   class ActorControl
     attr_reader :id, :guid, :default_constraints
 
+    # @see Determinator::Control#for_actor
     def initialize(controller, id: nil, guid: nil, default_properties: {})
       @id = id
       @guid = guid
@@ -12,6 +13,7 @@ module Determinator
       @controller = controller
     end
 
+    # @see Determinator::Control#which_variant
     def which_variant(name, properties: {})
       controller.which_variant(
         name,
@@ -21,6 +23,7 @@ module Determinator
       )
     end
 
+    # @see Determinator::Control#feature_flag_on?
     def feature_flag_on?(name, properties: {})
       controller.feature_flag_on?(
         name,
