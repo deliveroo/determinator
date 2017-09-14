@@ -12,13 +12,13 @@ describe Determinator::Retrieve::Routemaster do
     allow(::Routemaster::Drain::Caching).to receive(:new).and_return(routemaster_app)
 
     allow(::Routemaster::Config).to receive(:cache_redis).and_return(cache_redis)
-    allow(cache_redis).to receive(:get).with("determinator_index:#{feature_name}").and_return(feature_id)
+    allow(cache_redis).to receive(:get).with("determinator_index:#{feature_id}").and_return(feature_id)
   end
 
   describe '#retrieve' do
-    subject(:method_call) { instance.retrieve(feature_name) }
-    let(:feature_name) { 'my_feature' }
-    let(:feature_id) { 1 }
+    subject(:method_call) { instance.retrieve(feature_id) }
+    let(:feature_name) { 'My Feature' }
+    let(:feature_id) { feature_name.parameterize }
     let(:override) { double(user_id: rand(100), variant: 'blue') }
 
     let(:routemaster_scope) { double }
@@ -99,14 +99,6 @@ describe Determinator::Retrieve::Routemaster do
         allow(routemaster_scope).to receive(:show).with(feature_id).and_raise(
           ::Routemaster::Errors::ResourceNotFound.new({})
         )
-      end
-
-      it { should be_nil }
-    end
-
-    context "when the requested feature name isn't present in the index" do
-      before do
-        allow(cache_redis).to receive(:get).and_return(nil)
       end
 
       it { should be_nil }
