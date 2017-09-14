@@ -43,13 +43,14 @@ variant = determinator.which_variant(
 
 Determinator requires your application to be subscribed to the a `features` topic via Routemaster.
 
-The drain must expire the any routemaster cache on receipt of events, `Routemaster::Drain::CacheBusting.new` or better.
+The drain must expire the routemaster cache on receipt of events, `Routemaster::Drain::CacheBusting.new` or better.
 
 Check the example Rails app in `examples` for more information on how to make use of this gem.
 
 ```
-require 'determinator/retrieve/routemaster'
+# config/initializers/determinator.rb
 
+require 'determinator/retrieve/routemaster'
 Determinator.configure(
   retrieval: Determinator::Retrieve::Routemaster.new(
     discovery_url: 'https://florence.dev/'
@@ -57,6 +58,10 @@ Determinator.configure(
   )
 )
 ```
+
+### Retrieval Cache
+
+Determinator will function fully without a retrieval_cache set, although Determinator will produce 1 Redis query for every determination. By setting a `retrieval_cache` as an instance of `ActiveSupport::Cache::MemoryStore` (or equivalent) this can be reduced per application instance. This cache is not expired so *must* have a `expires_in` set, ideally to a short amount of time.
 
 ## Contributing
 
