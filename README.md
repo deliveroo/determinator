@@ -1,8 +1,14 @@
 # Determinator
 
-A gem that works with [Florence](https://github.com/deliveroo/actor-tracking) to deterministically calculate whether an actor (a customer, rider, restaurant or employee) should have a feature flag turned on or off, or which variant they should see in an experiment.
+A gem that works with _Florence_ to deterministically calculate whether an **actor** should have a feature flag turned on or off, or which variant they should see in an experiment.
 
 ![Determinator](docs/img/determinator.jpg)
+
+Useful documentation:
+
+- [Terminology and Background](docs/background.md)
+- [Local development](docs/local_development.md)
+- [Example implemention in Rails](examples/determinator-rails)
 
 ## Usage
 
@@ -25,16 +31,14 @@ when 'velociraptors'
 end
 ```
 
-Feature flags and Experiments can be configured to have string based constraints. When the experiment's _constraints_ do not match the given actor's _properties_, the flag or experiment will always be off. When they match the rollout specified by the feature will be applied.
-
-Constraints must be strings, what matches and doesn't is configurable after-the-fact within Florence.
+Feature flags and experiments can be targeted to specific actors by specifying actor properties (which must match the constraints defined in the feature).
 
 ```ruby
-# Constraints
+# Targeting specific actors
 variant = determinator.which_variant(
   :my_experiment_name,
   properties: {
-    country_of_first_order: current_user.orders.first.country.tld,
+    employee: current_user.employee?
   }
 )
 ```
@@ -53,7 +57,7 @@ Check the example Rails app in `examples` for more information on how to make us
 require 'determinator/retrieve/routemaster'
 Determinator.configure(
   retrieval: Determinator::Retrieve::Routemaster.new(
-    discovery_url: 'https://florence.dev/'
+    discovery_url: 'https://flo.dev/'
     retrieval_cache: ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
   )
 )
