@@ -6,4 +6,4 @@ Breaking changes:
 Features:
 - Remove siphon drain step, determinator now requires just a drain that expires caches. Also Removes the caching step for ID lookup (#24)
 - Added Determinator RSpec helper (#26)
-
+- Allows Determinator to accept both legacy and new style contraint and override specifications, for upcoming Florence API migration (#25)
