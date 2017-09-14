@@ -3,7 +3,7 @@ module Determinator
   # Useful for contexts where the actor remains constant (eg. inside
   # the request cycle in a webapp)
   class ActorControl
-    attr_reader :id, :guid, :default_constraints
+    attr_reader :id, :guid, :default_properties
 
     # @see Determinator::Control#for_actor
     def initialize(controller, id: nil, guid: nil, default_properties: {})
