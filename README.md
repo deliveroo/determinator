@@ -25,7 +25,7 @@ when 'velociraptors'
 end
 ```
 
-Feature flags and Experiments can be configured to have string based constraints. When the strings required for the experiment do not match, the user will _never_ see the flag or the experiment, when they match, then the rollout specified by the feature will be applied.
+Feature flags and Experiments can be configured to have string based constraints. When the experiment's _constraints_ do not match the given actor's _properties_, the flag or experiment will always be off. When they match the rollout specified by the feature will be applied.
 
 Constraints must be strings, what matches and doesn't is configurable after-the-fact within Florence.
 
@@ -33,7 +33,7 @@ Constraints must be strings, what matches and doesn't is configurable after-the-
 # Constraints
 variant = determinator.which_variant(
   :my_experiment_name,
-  constraints: {
+  properties: {
     country_of_first_order: current_user.orders.first.country.tld,
   }
 )
