@@ -8,7 +8,7 @@
 
 ## Targeting actors
 
-Florence also provides a very flexible way to target specific actors for new features or experiments. Every feature has one or more **target groups** associated with it each fo which specifies a _rollout_ fraction and any number of _constraints_.
+Florence also provides a very flexible way to target specific actors for new features or experiments. Every feature has one or more **target groups** associated with it each for which specifies a _rollout_ fraction and any number of _constraints_.
 
 For a given feature an actor is part of a target group if the actor's **properties** are a match with the target group's **constraints** (ie. the feature's constraints are a subset of the actor's properties). For example, a customer may have a property `employee: 'false'`; this actor would _not_ be part of a target group with the constraint `employee: 'true'`, but _would_ be part of a target group with no constraints.
 
