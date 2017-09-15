@@ -31,7 +31,8 @@ module Determinator
         cached_feature_lookup(feature_id) do
           @actor_service.feature.show(feature_id)
         end
-      rescue ::Routemaster::Errors::ResourceNotFound
+      rescue => e
+        Determinator.notice_error(e)
         nil
       end
 
