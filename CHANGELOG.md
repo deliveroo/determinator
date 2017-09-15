@@ -1,3 +1,8 @@
+# v0.10.0 (2017-09-15)
+
+Feature:
+- Determinator can now be configured to log errors with any external service (#32)
+
 # v0.9.1 (2017-09-14)
 
 Bug fix:
