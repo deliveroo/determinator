@@ -14,7 +14,12 @@ class ApplicationController < ActionController::API
     # which allows simple use throughout the app
     @_determinator ||= Determinator.instance.for_actor(
       id: current_user && current_user.id || nil,
-      guid: guid
+      guid: guid,
+      default_properties: {
+        # Clearly this would return real information about whether the
+        # user is an employee.
+        employee: false
+      }
     )
   end
 end
