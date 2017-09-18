@@ -57,6 +57,12 @@ describe Determinator::Control do
       it { should eq match_value }
     end
 
+    context "when the actor properties have string keys, but the constraints have symbol keys" do
+      let(:actor_properties) { { 'a' => '1' } }
+
+      it { should eq match_value }
+    end
+
     context "when the actor properties don't match" do
       let(:actor_properties) { { a: '2' } }
 
@@ -160,6 +166,12 @@ describe Determinator::Control do
 
     context "when the feature has one target group with one constraint" do
       let(:feature_constraints) { { a: '1' } }
+
+      include_examples 'for various actor properties', responses[:name]
+    end
+
+    context "when the feature has one target group with one constraint with a string key" do
+      let(:feature_constraints) { { 'a' => '1' } }
 
       include_examples 'for various actor properties', responses[:name]
     end

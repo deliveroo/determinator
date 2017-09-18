@@ -47,10 +47,6 @@ module Determinator
         @routemaster_app ||= ::Routemaster::Drain::Caching.new
       end
 
-      def self.index_cache_key(feature_name)
-        "determinator_index:#{feature_name}"
-      end
-
       def self.lookup_cache_key(feature_name)
         "determinator_cache:#{feature_name}"
       end

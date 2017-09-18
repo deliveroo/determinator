@@ -86,9 +86,14 @@ module Determinator
     end
 
     def choose_target_group(feature, properties)
+      # Keys must be strings
+      normalised_properties = properties.each_with_object({}) do |(k, v), h|
+        h[k.to_s] = v
+      end
+
       feature.target_groups.select { |tg|
         tg.constraints.reduce(true) do |fit, (scope, *required)|
-          present = [*properties[scope]]
+          present = [*normalised_properties[scope.to_s]]
           fit && (required.flatten & present.flatten).any?
         end
       # Must choose target group deterministically, if more than one match
