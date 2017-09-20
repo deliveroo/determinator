@@ -7,7 +7,7 @@ module RSpec
 
       by.let(:fake_determinator) { FakeControl.new }
       by.before do
-        allow(::Determinator::Control).to receive(:new).and_return(fake_determinator)
+        allow(::Determinator).to receive(:instance).and_return(fake_determinator)
       end
     end
 

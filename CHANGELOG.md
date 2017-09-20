@@ -2,6 +2,7 @@
 
 Bug fix:
 - Ensure constraints and properties are string-keyed so that they match regardless of which are used (#33)
+- Be more permissive with the situations where `Rspec::Determinator` can be used (#34)
 
 # v0.10.0 (2017-09-15)
 

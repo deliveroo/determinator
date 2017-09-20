@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Determinator::Retrieve::Routemaster do
   let(:instance) { described_class.new(discovery_url: discovery_url) }
-  let(:discovery_url) { 'https://florence' }
+  let(:discovery_url) { 'https://flo.dev' }
   let(:routemaster) { double('routemaster') }
   let(:routemaster_app) { double('routemaster app') }
   let(:cache_redis) { double('redis') }

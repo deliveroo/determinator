@@ -1,7 +1,11 @@
 require 'rspec/determinator'
 
+# Determinator config is always done outside tests, this
+# emulates that.
+Determinator.configure(retrieval: nil)
+
 describe RSpec::Determinator, :determinator_support do
-  subject(:determinator) { Determinator.configure(retrieval: nil) }
+  subject(:determinator) { Determinator.instance }
 
   describe 'the determination for the experiment' do
     subject(:determination) { determinator.which_variant(:my_experiment, properties: properties) }
