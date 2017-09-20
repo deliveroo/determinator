@@ -12,21 +12,33 @@ require 'rspec/determinator'
 RSpec.describe YourClass, :determinator_support do
 
   context "when the actor is in variant_a" do
+    # This allows testing of the experiment being in a specific variant
     forced_determination(:experiment_name, 'variant_a')
 
     it "should respond in a way that is defined by variant_a"
   end
 
-   context "when the actor is not in the experiment" do
+  context "when the actor is not in the experiment" do
+    # This allows testing of the experiment being off
     forced_determination(:experiment_name, false)
 
     it "should respond in a way that is defined by being out of the experiment"
   end
 
   context "when the actor is not from France" do
+    before { ensure_the_actor_is_not_from_france }
+    # This allows testing of target group constraint functionality
     forced_determination(:experiment_name, 'variant_b', only_for: { country: 'fr' })
 
     it "should respond in a way that is defined by being out of the experiment"
+  end
+
+  context "when the actor has a specified id" do
+    before { ensure_the_actor_has_id_123 }
+    # This allows testing of override functionality
+    forced_determination(:experiment_name, 'variant_b', only_for: { id: '123' })
+
+    it "should respond in a way that is defined by variant_b"
   end
 end
 ```
