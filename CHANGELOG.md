@@ -1,4 +1,4 @@
-# HEAD
+# v0.11.0 (2017-10-13)
 
 Bug fix:
 - Ensure constraints and properties are string-keyed so that they match regardless of which are used (#33)
