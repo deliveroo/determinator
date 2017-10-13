@@ -60,7 +60,8 @@ Determinator.configure(
     discovery_url: 'https://flo.dev/'
     retrieval_cache: ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
   ),
-  errors: -> error { NewRelic::Agent.notice_error(error) }
+  errors: -> error { NewRelic::Agent.notice_error(error) },
+  missing_features: -> feature_name { STATSD.increment 'determinator.missing_feature', tags: ["feature:#{name}"] }
 )
 ```
 
