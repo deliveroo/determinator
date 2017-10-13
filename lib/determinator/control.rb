@@ -57,7 +57,10 @@ module Determinator
 
     def determinate(name, id:, guid:, properties:)
       feature = retrieval.retrieve(name)
-      return false unless feature
+      if feature.nil?
+        Determinator.missing_feature(name)
+        return false
+      end
 
       # Calling method can place constraints on the feature, eg. experiment only
       return false if block_given? && !yield(feature)

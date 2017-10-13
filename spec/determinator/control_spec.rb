@@ -195,6 +195,18 @@ describe Determinator::Control do
     it { should eq(false) }
   end
 
+  shared_examples "feature doesn't exist" do
+    context 'when the feature is missing' do
+      # This mocks that the retrieval class doesn't have the feature
+      let(:feature) { nil }
+
+      it 'should call the missing feature proc' do
+        expect(Determinator).to receive(:missing_feature).with(feature_name)
+        method_call
+      end
+    end
+  end
+
   # Tests for features
   describe '#feature_flag_on?' do
     subject(:method_call) { instance.feature_flag_on?(
@@ -224,6 +236,8 @@ describe Determinator::Control do
     context 'when the feature is inactive' do
       it_behaves_like 'feature is inactive'
     end
+
+    include_examples "feature doesn't exist"
   end
 
   # Tests for experiments
@@ -281,5 +295,7 @@ describe Determinator::Control do
         expect(subject).to eq(winning_variant)
       end
     end
+
+    include_examples "feature doesn't exist"
   end
 end
