@@ -1,3 +1,8 @@
+# HEAD
+
+Feature:
+- Allows the use of example-scoped variables for outcomes and constraints in `RSpec::Determinator`'s mocks. (#36)
+
 # v0.11.0 (2017-10-13)
 
 Bug fix:
