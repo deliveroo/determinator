@@ -12,11 +12,23 @@ module RSpec
     end
 
     module DSL
-      def forced_determination(name, result, only_for: {})
+      # Ensure that for the duration of the example all determinations made for the given experiment or feature flag
+      # will have the given outcome (but only if the constraints specified are met exactly).
+      #
+      # If `outcome` or `only_for` are Symbols then the example-scoped variable of that name will be referenced (ie. those
+      # variables created by `let` declarations)
+      #
+      # @params name [#to_s] The name of the Feature Flag or Experiment to mock
+      # @params outcome [Boolean,String,Symbol] The outcome which should be supplied. Will look up an example variable if a Symbol is given.
+      # @params :only_for [Hash,Symbol] The constraints that must be matched exactly in order for the determination to be applied.
+      def forced_determination(name, outcome, only_for: {})
         before do
+          outcome = send(outcome) if outcome.is_a?(Symbol)
+          only_for = send(only_for) if only_for.is_a?(Symbol)
+
           fake_determinator.mock_result(
             name,
-            result,
+            outcome,
             only_for: only_for
           )
         end

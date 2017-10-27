@@ -43,6 +43,8 @@ variant = determinator.which_variant(
 )
 ```
 
+Writing tests? Check out the [Local development](docs/local_development.md) docs to see examples of `RSpec::Determinator` to help you mock your Feature Flags and Experiments.
+
 ## Installation
 
 Determinator requires your application to be subscribed to the a `features` topic via Routemaster.

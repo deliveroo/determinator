@@ -15,14 +15,18 @@ RSpec.describe YourClass, :determinator_support do
     # This allows testing of the experiment being in a specific variant
     forced_determination(:experiment_name, 'variant_a')
 
-    it "should respond in a way that is defined by variant_a"
+    it "should respond in a way that is defined by variant_a" do
+      # … etc
+    end
   end
 
   context "when the actor is not in the experiment" do
     # This allows testing of the experiment being off
     forced_determination(:experiment_name, false)
 
-    it "should respond in a way that is defined by being out of the experiment"
+    it "should respond in a way that is defined by being out of the experiment" do
+      # … etc
+    end
   end
 
   context "when the actor is not from France" do
@@ -30,7 +34,18 @@ RSpec.describe YourClass, :determinator_support do
     # This allows testing of target group constraint functionality
     forced_determination(:experiment_name, 'variant_b', only_for: { country: 'fr' })
 
-    it "should respond in a way that is defined by being out of the experiment"
+    it "should respond in a way that is defined by being out of the experiment" do
+      # … etc
+    end
+  end
+
+  context "when the constraints are defined dynamically" do
+    forced_determination(:experiment_name, 'variant_b', only_for: constraints)
+    let(:constraints) { { employee: true } }
+
+    it "should respond in a way that shows employees the experiment" do
+      # … etc
+    end
   end
 
   context "when the actor has a specified id" do
@@ -38,10 +53,13 @@ RSpec.describe YourClass, :determinator_support do
     # This allows testing of override functionality
     forced_determination(:experiment_name, 'variant_b', only_for: { id: '123' })
 
-    it "should respond in a way that is defined by variant_b"
-  end
+    it "should respond in a way that is defined by variant_b" do
+      # … etc
+    end
 end
 ```
+
+Note that you can use Symbols for either the constraint declaration (`only_for`) or the outcome declaration and that variable or method will be called and the result used for that value. This is particularly helpful for examples which use the `let` scope declarations for cleaner tests.
 
 ## Fake Florence for local execution
 

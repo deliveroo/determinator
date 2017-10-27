@@ -21,8 +21,22 @@ describe RSpec::Determinator, :determinator_support do
       it { should eq 'outcome' }
     end
 
+    context 'when forcing a determination with an example-scoped variable for the outcome' do
+      forced_determination(:my_experiment, :outcome)
+      let(:outcome) { 'some_outcome' }
+
+      it { should eq 'some_outcome' }
+    end
+
     context 'when forcing a determination for actors with specific properties that match' do
       forced_determination(:my_experiment, 'outcome', only_for: { property: 'correct' })
+      let(:properties) { { property: 'correct' } }
+
+      it { should eq 'outcome' }
+    end
+
+    context 'when forcing a determination for actors with specific properties that match when using an example-scoped variable for constraints' do
+      forced_determination(:my_experiment, 'outcome', only_for: :properties)
       let(:properties) { { property: 'correct' } }
 
       it { should eq 'outcome' }
