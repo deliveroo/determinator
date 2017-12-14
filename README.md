@@ -67,6 +67,38 @@ Determinator.configure(
 )
 ```
 
+### Using Determinator in RSpec
+
+* Include those lines in `spec_helper.rb`.
+
+
+```
+require 'rspec/determinator'
+
+Determinator.configure(retrieval: nil)
+
+```
+
+* Tag your rspec test with `:determinator_support`, so `forced_determination` helper method will be available.
+
+
+```
+
+RSpec.describe "something", :determinator_support do
+
+  context "something" do
+    forced_determination(:my_feature_flag, true)
+    forced_determination(:my_experiment, "variant_a")
+
+    it "uses forced_determination" do
+      expect(Determinator.instance.feature_flag_on?(:my_feature_flag)).to eq(true)
+      expect(Determinator.instance.which_variant(:my_experiment)).to eq("variant_a")
+    end
+  end
+end
+
+```
+
 ### Retrieval Cache
 
 Determinator will function fully without a retrieval_cache set, although Determinator will produce 1 Redis query for every determination. By setting a `retrieval_cache` as an instance of `ActiveSupport::Cache::MemoryStore` (or equivalent) this can be reduced per application instance. This cache is not expired so *must* have a `expires_in` set, ideally to a short amount of time.
