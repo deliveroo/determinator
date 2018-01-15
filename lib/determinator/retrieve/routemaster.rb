@@ -27,9 +27,11 @@ module Determinator
 
       end
 
-      def retrieve(feature_id)
-        cached_feature_lookup(feature_id) do
-          @actor_service.feature.show(feature_id)
+      # Retrieves and processes the feature that goes by the given name on this retrieval mechanism.
+      # @return [Determinator::Feature,nil] The details of the specified feature
+      def retrieve(name)
+        cached_feature_lookup(name) do
+          @actor_service.feature.show(name)
         end
       rescue ::Routemaster::Errors::ResourceNotFound
         # Don't be noisy
