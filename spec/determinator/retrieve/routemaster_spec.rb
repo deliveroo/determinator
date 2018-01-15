@@ -54,7 +54,7 @@ describe Determinator::Retrieve::Routemaster do
           Determinator::TargetGroup.new(
             rollout: 1_000,
             constraints: {
-              'country' => 'uk'
+              'country' => ['uk']
             }
           )
         ] }
@@ -81,67 +81,34 @@ describe Determinator::Retrieve::Routemaster do
       end
     end
 
-    context 'with a legacy API service' do
-      let(:hateoas_response) { Hashie::Mash.new(
-        body: {
-          id: feature_id,
-          name: feature_name,
-          identifier: 'a',
-          bucket_type: 'id',
-          active: true,
-          target_groups: [
-            {
-              rollout: 32_768,
-              constraints: []
-            },{
-              rollout: 1_000,
-              constraints: [{
-                scope: 'country',
-                identifier: 'uk'
-              }]
+    let(:hateoas_response) { Hashie::Mash.new(
+      body: {
+        id: feature_id,
+        name: feature_name,
+        identifier: 'a',
+        bucket_type: 'id',
+        active: true,
+        target_groups: [
+          {
+            rollout: 32_768,
+            constraints: {}
+          },{
+            rollout: 1_000,
+            constraints: {
+              country: 'uk'
             }
-          ],
-          variants: {
-            red: 1,
-            blue: 1
-          },
-          overrides: [override]
-        }
-      ) }
-
-      include_examples 'correctly parses Feature objects'
-    end
-
-    context 'with a modern API service' do
-      let(:hateoas_response) { Hashie::Mash.new(
-        body: {
-          id: feature_id,
-          name: feature_name,
-          identifier: 'a',
-          bucket_type: 'id',
-          active: true,
-          target_groups: [
-            {
-              rollout: 32_768,
-              constraints: {}
-            },{
-              rollout: 1_000,
-              constraints: {
-                country: 'uk'
-              }
-            }
-          ],
-          variants: {
-            red: 1,
-            blue: 1
-          },
-          overrides: {
-            override[:user_id] => override[:variant]
           }
+        ],
+        variants: {
+          red: 1,
+          blue: 1
+        },
+        overrides: {
+          override[:user_id] => override[:variant]
         }
-      ) }
+      }
+    ) }
 
-      include_examples 'correctly parses Feature objects'
-    end
+    include_examples 'correctly parses Feature objects'
   end
 end

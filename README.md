@@ -85,10 +85,12 @@ Determinator.configure(
   retrieval: Determinator::Retrieve::Routemaster.new(
     discovery_url: 'https://flo.dev/'
     retrieval_cache: ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
-  ),
-  errors: -> error { NewRelic::Agent.notice_error(error) },
-  missing_features: -> feature_name { STATSD.increment 'determinator.missing_feature', tags: ["feature:#{name}"] }
+  )
 )
+Determinator.on_error(NewRelic::Agent.method(:notice_error))
+Determinator.on_missing_feature do |feature_name|
+  STATSD.increment 'determinator.missing_feature', tags: ["feature:#{name}"]
+end
 ```
 
 This configures the `Determinator.instance` with:
@@ -178,6 +180,14 @@ end
 ### Retrieval Cache
 
 Determinator will function fully without a retrieval_cache set, although Determinator will produce 1 Redis query for every determination. By setting a `retrieval_cache` as an instance of `ActiveSupport::Cache::MemoryStore` (or equivalent) this can be reduced per application instance. This cache is not expired so *must* have a `expires_in` set, ideally to a short amount of time.
+
+## Testing this library
+
+This library makes use of the [Determinator Standard Tests](https://github.com/deliveroo/determinator-standard-tests) to ensure that it conforms to the same specification as determinator libraries in other languages. The standard tests can be updated to the latest ones available by updating the submodule:
+
+```bash
+git submodule foreach git pull origin master
+```
 
 ## Contributing
 
