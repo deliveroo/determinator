@@ -15,9 +15,18 @@ module Determinator
     @instance = Control.new(retrieval: retrieval)
   end
 
+  # @return [Determinator::Control] The currently active instance of determinator.
+  # @raises [RuntimeError] If no Determinator instance is set up (with `.configure`)
   def self.instance
     raise "No singleton Determinator instance defined" unless @instance
     @instance
+  end
+
+  # Returns the feature with the given name as Determinator uses it. This is useful for
+  # debugging issues with the retrieval mechanism which delivers features to Determinator.
+  # @returns [Determinator::Feature,nil] The feature details Determinator would use for a determination right now.
+  def self.feature_details(name)
+    instance.retrieval.retrieve(name)
   end
 
   def self.notice_error(error)
