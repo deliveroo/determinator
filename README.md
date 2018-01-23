@@ -2,13 +2,25 @@
 
 A gem that works with _Florence_ to deterministically calculate whether an **actor** should have a feature flag turned on or off, or which variant they should see in an experiment.
 
-![Determinator](docs/img/determinator.jpg)
+![Arnold Schwarzenegger might say "Come with me if you want to experiment" if he played The Determinator instead of The Terminator.](docs/img/determinator.jpg)
 
-Useful documentation:
+---
+
+#### Useful documentation
 
 - [Terminology and Background](docs/background.md)
 - [Local development](docs/local_development.md)
 - [Example implemention in Rails](examples/determinator-rails)
+
+#### Getting help
+
+For Deliveroo Employees:
+
+- Many people contribute to Determinator and Florence. We hang out in [this Slack channel](slack://channel?team=T03EUNC3F&id=C7437816J)
+- [This JIRA board](https://deliveroo.atlassian.net/secure/RapidBoard.jspa?rapidView=156) covers pieces of work that are planned or in-flight
+- [This Workplace group](https://deliveroo.facebook.com/groups/1893254264328414/) holds more general discussions about the Florence ecosystem
+
+At the moment we can only promise support for Determinator within Deliveroo, but if you add [issues to this github repo](https://github.com/deliveroo/determinator/issues) we'll try and help if we can!
 
 ## Usage
 
