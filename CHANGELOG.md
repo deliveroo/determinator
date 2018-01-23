@@ -3,6 +3,9 @@
 Feature:
 - Adds the `Determinator.feature_details` method, which allows lookup of feature details as are currently available to Determinator. Whatever is returned here is what Determinator is acting upon. (#38)
 
+Bug Fix:
+- Upgrades a dependency of the example rails app which has a known vulnerability. (#39)
+
 # v0.11.1 (2017-10-27)
 
 Feature:
