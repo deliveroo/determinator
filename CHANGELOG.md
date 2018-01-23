@@ -1,4 +1,4 @@
-# HEAD
+# v0.12.0 (2018-01-23)
 
 Feature:
 - Adds the `Determinator.feature_details` method, which allows lookup of feature details as are currently available to Determinator. Whatever is returned here is what Determinator is acting upon. (#38)
