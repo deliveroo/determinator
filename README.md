@@ -16,24 +16,38 @@ A gem that works with _Florence_ to deterministically calculate whether an **act
 
 For Deliveroo Employees:
 
-- Many people contribute to Determinator and Florence. We hang out in [this Slack channel](slack://channel?team=T03EUNC3F&id=C7437816J)
+- Many people contribute to Determinator and Florence. We hang out in [this Slack channel](https://deliveroo.slack.com/app_redirect?channel=florence_wg)
 - [This JIRA board](https://deliveroo.atlassian.net/secure/RapidBoard.jspa?rapidView=156) covers pieces of work that are planned or in-flight
 - [This Workplace group](https://deliveroo.facebook.com/groups/1893254264328414/) holds more general discussions about the Florence ecosystem
 
 At the moment we can only promise support for Determinator within Deliveroo, but if you add [issues to this github repo](https://github.com/deliveroo/determinator/issues) we'll try and help if we can!
 
-## Usage
+## Basic Use
 
-Once [set up](#installation), determinator can be used to determine whether a **feature flag** or **experiment** is on or off for the current user and, for experiments, which **variant** they should see.
+Once [set up](#installation), determinator can be used to determine whether a **feature flag** or **experiment** is on or off for the current actor (or user) and, for experiments, which **variant** they should see.
 
 ```ruby
-# Feature flags
+# Feature flags: the basics
+Determinator.instance.feature_flag_on?(:my_feature_name, id: 'some user')
+# => true
+Determinator.instance.feature_flag_on?(:my_feature_name, id: 'another user')
+# => false
+
+# A handy short cut…
+def determinator
+  # See the urther Usage section below for a handy shorthand which means ID
+  # and GUID don't need to be specified every time you need a determination.
+end
+
+# Which means you can also do:
 if determinator.feature_flag_on?(:my_feature_name)
   # Show the feature
 end
 
 # Experiments
 case determinator.which_variant(:my_experiment_name)
+when false
+  # This actor isn't in a target group for this experiment
 when 'control'
   # Do nothing different
 when 'sloths'
@@ -43,7 +57,9 @@ when 'velociraptors'
 end
 ```
 
-Feature flags and experiments can be targeted to specific actors by specifying actor properties (which must match the constraints defined in the feature).
+Please note that Determinator requires an identifier for your actor — either an ID (when they are logged in, eg. a user id), or a globally unique id (GUID) that identifies them across sessions (which would normally be storied in a cookie or in a long-lived session store).
+
+Feature flags and experiments can be limited to actors with specific properties by specifying them when (which must match the constraints defined in the feature).
 
 ```ruby
 # Targeting specific actors
@@ -59,13 +75,9 @@ Writing tests? Check out the [Local development](docs/local_development.md) docs
 
 ## Installation
 
-Determinator requires your application to be subscribed to the a `features` topic via Routemaster.
+Determinator requires a initialiser block somewhere in your application's boot process, it might look something like this:
 
-The drain must expire the routemaster cache on receipt of events, `Routemaster::Drain::CacheBusting.new` or better.
-
-Check the example Rails app in `examples` for more information on how to make use of this gem.
-
-```
+```ruby
 # config/initializers/determinator.rb
 
 require 'determinator/retrieve/routemaster'
@@ -79,16 +91,67 @@ Determinator.configure(
 )
 ```
 
+This configures the `Determinator.instance` with:
+
+- What **retrieval** mechanism should be used to get feature details
+- (optional) How **errors** should be reported
+- (optional) How **missing features** should be monitored (as they indicate something's up with your code or your set up!)
+
+You may also want to configure a `determinator` helper method inside your web request scope, see below for more information.
+
+## Further Usage
+
+Once this is done you can ask for a determination like this:
+
+```ruby
+# Anywhere in your application:
+variant = Determinator.instance.which_variant?(
+  :my_experiment_name,
+  id: 123,
+  guid: 'anonymous id',
+  properties: {
+    employee: true,
+    using_top_level_domain: 'uk'
+  }
+)
+```
+
+Or, if you're within a web request, you might want to use a shorthand, and let determinator remember the ID, GUID and any properties which will be true. The following will have the same effect:
+
+```ruby
+# Somewhere inside your request's scope:
+def determinator
+  @determinator ||= Determinator.instance.for_actor(
+    id: 123,
+    guid: 'anonymous id',
+    default_properties: {
+      employee: true,
+      using_top_level_domain: 'uk'
+    }
+  )
+end
+
+# Anywhere in your requests' scope:
+determinator.which_variant(:my_experiment_name)
+```
+
+Check the example Rails app in the `examples` directory for more information on how to make use of this gem.
+
+### Routemaster
+
+Determinator's [Routemaster](https://github.com/deliveroo/routemaster) integration requires your application to be subscribed to the a `features` topic.
+
+The drain must expire the routemaster cache on receipt of events, making use of  `Routemaster::Drain::CacheBusting.new` or similar is recommended.
+
 ### Using Determinator in RSpec
 
-* Include those lines in `spec_helper.rb`.
+* Include the  `spec_helper.rb`.
 
 
 ```
 require 'rspec/determinator'
 
 Determinator.configure(retrieval: nil)
-
 ```
 
 * Tag your rspec test with `:determinator_support`, so `forced_determination` helper method will be available.
