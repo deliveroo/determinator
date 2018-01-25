@@ -34,10 +34,15 @@ Determinator.instance.feature_flag_on?(:my_feature_name, id: 'another user')
 # => false
 
 # A handy short cut…
-def determinator
-  # See the urther Usage section below for a handy shorthand which means ID
-  # and GUID don't need to be specified every time you need a determination.
-end
+determinator = Determinator.instance.for_actor(
+  id: 'some user id',
+  guid: 'some anonymous user id',
+  default_properties: {
+    employee: true
+  }
+)
+# See the Further Usage section below for a handy snippet like this which means ID
+# and GUID don't need to be specified every time you need a determination.
 
 # Which means you can also do:
 if determinator.feature_flag_on?(:my_feature_name)
@@ -148,7 +153,7 @@ The drain must expire the routemaster cache on receipt of events, making use of 
 * Include the  `spec_helper.rb`.
 
 
-```
+```ruby
 require 'rspec/determinator'
 
 Determinator.configure(retrieval: nil)
@@ -157,8 +162,7 @@ Determinator.configure(retrieval: nil)
 * Tag your rspec test with `:determinator_support`, so `forced_determination` helper method will be available.
 
 
-```
-
+```ruby
 RSpec.describe "something", :determinator_support do
 
   context "something" do
@@ -170,8 +174,8 @@ RSpec.describe "something", :determinator_support do
       expect(Determinator.instance.which_variant(:my_experiment)).to eq("variant_a")
     end
   end
-end
 
+end
 ```
 
 ### Retrieval Cache
