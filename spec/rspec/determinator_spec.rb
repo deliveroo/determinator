@@ -64,5 +64,19 @@ describe RSpec::Determinator, :determinator_support do
 
       it { should eq 'first outcome' }
     end
+
+    context 'when using an ActorControl proxy' do
+      let(:determinator) { Determinator.instance.for_actor(id: 123) }
+
+      context 'when not forcing a determination' do
+        it { should eq false }
+      end
+
+      context 'when forcing a determination' do
+        forced_determination(:my_experiment, 'outcome')
+
+        it { should eq 'outcome' }
+      end
+    end
   end
 end

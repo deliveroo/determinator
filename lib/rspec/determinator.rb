@@ -40,6 +40,10 @@ module RSpec
         @mocked_results = Hash.new { |h, k| h[k] = {} }
       end
 
+      def for_actor(**args)
+        ::Determinator::ActorControl.new(self, **args)
+      end
+
       def mock_result(name, result, only_for: {})
         @mocked_results[name.to_s][only_for] = result
       end
