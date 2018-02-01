@@ -1,4 +1,4 @@
-# HEAD
+# v0.12.1 (2018-02-01)
 
 Bug Fix:
 - Allow `.for_actor` calls when using `RSpec::Determinator` to test code that uses determinator. (#44)
