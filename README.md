@@ -147,32 +147,33 @@ The drain must expire the routemaster cache on receipt of events, making use of 
 
 * Include the  `spec_helper.rb`.
 
-
-```
+```ruby
 require 'rspec/determinator'
 
 Determinator.configure(retrieval: nil)
 ```
 
-* Tag your rspec test with `:determinator_support`, so `forced_determination` helper method will be available.
+* Tag your rspec test with `:determinator_support`, so the `forced_determination` helper method will be available.
 
-
-```
-
+```ruby
 RSpec.describe "something", :determinator_support do
 
   context "something" do
     forced_determination(:my_feature_flag, true)
     forced_determination(:my_experiment, "variant_a")
+    forced_determination(:my_lazyexperiment, :some_lazy_variable)
+    let(:some_lazy_variable) { 'variant_b' }
 
     it "uses forced_determination" do
       expect(Determinator.instance.feature_flag_on?(:my_feature_flag)).to eq(true)
       expect(Determinator.instance.which_variant(:my_experiment)).to eq("variant_a")
+      expect(Determinator.instance.which_variant(:my_lazy_experiment)).to eq("variant_b")
     end
   end
 end
-
 ```
+
+* Check out [the specs for `RSpec::Determinator`](spec/rspec/determinator_spec.rb) to find out what you can do!
 
 ### Retrieval Cache
 
