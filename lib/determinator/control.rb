@@ -30,7 +30,7 @@ module Determinator
     # @raise [ArgumentError] When the arguments given to this method aren't ever going to produce a useful response
     # @return [true,false] Whether the feature is on (true) or off (false) for this actor
     def feature_flag_on?(name, id: nil, guid: nil, properties: {})
-      determinate(name, id: id, guid: guid, properties: properties) do |feature|
+      determinate_and_notice(name, id: id, guid: guid, properties: properties) do |feature|
         feature.feature_flag?
       end
     end
@@ -44,7 +44,7 @@ module Determinator
     # @raise [ArgumentError] When the arguments given to this method aren't ever going to produce a useful response
     # @return [false,String] Returns false, if the actor is not in this experiment, or otherwise the variant name.
     def which_variant(name, id: nil, guid: nil, properties: {})
-      determinate(name, id: id, guid: guid, properties: properties) do |feature|
+      determinate_and_notice(name, id: id, guid: guid, properties: properties) do |feature|
         feature.experiment?
       end
     end
@@ -57,10 +57,17 @@ module Determinator
 
     Indicators = Struct.new(:rollout, :variant)
 
-    def determinate(name, id:, guid:, properties:)
+    def determinate_and_notice(name, id:, guid:, properties:)
       feature = retrieval.retrieve(name)
+
+      determinate(feature, id: id, guid: guid, properties: properties).tap do |determination|
+        Determinator.notice_determination(id, guid, feature, determination)
+      end
+    end
+
+    def determinate(feature, id:, guid:, properties:)
       if feature.nil?
-        Determinator.notice_missing_feature(name)
+        Determinator.notice_missing_feature(feature.name)
         return false
       end
 

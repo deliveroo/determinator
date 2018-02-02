@@ -35,7 +35,22 @@ module Determinator
     def on_missing_feature(&block)
       @missing_feature_logger = block
     end
-    
+
+    # Defines code that should execute when a determination is completed. This is particularly
+    # helpful for preparing or sending events to record that an actor has seen a particular experiment variant.
+    #
+    # Please note that this block will be executed _synchronously_ before delivering the determination to the callsite.
+    #
+    # @yield [id, guid, feature, determination] Will be called when a determination was requested for the
+    #   specified `feature`, for the actor with `id` and `guid`, and received the determination `determination`.
+    # @yieldparam id [String, nil] The ID that was used to request the determination
+    # @yieldparam guid [String, nil] The GUID that was used to request the determination
+    # @yieldparam feature [Determinator::Feature] The feature that was requested
+    # @yieldparam determination [String,Boolean] The result of the determination
+    def on_determination(&block)
+      @determination_callback = block
+    end
+
     # Returns the feature with the given name as Determinator uses it. This is useful for
     # debugging issues with the retrieval mechanism which delivers features to Determinator.
     # @returns [Determinator::Feature,nil] The feature details Determinator would use for a determination right now.
@@ -54,6 +69,11 @@ module Determinator
       return unless @missing_feature_logger
 
       @missing_feature_logger.call(name)
+    end
+
+    def notice_determination(id, guid, feature, determination)
+      return unless @determination_callback
+      @determination_callback.call(id, guid, feature, determination)
     end
   end
 end

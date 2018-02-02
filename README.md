@@ -91,6 +91,16 @@ Determinator.on_error(NewRelic::Agent.method(:notice_error))
 Determinator.on_missing_feature do |feature_name|
   STATSD.increment 'determinator.missing_feature', tags: ["feature:#{name}"]
 end
+
+Determinator.on_determination do |id, guid, feature, determination|
+  if feature.experiment? && determination !== false
+    YourTrackingSolution.record_variant_viewing(
+      user_id: id,
+      experiment_name: feature.name,
+      variant: determination
+    )
+  end
+end
 ```
 
 This configures the `Determinator.instance` with:
