@@ -81,12 +81,12 @@ Determinator requires a initialiser block somewhere in your application's boot p
 # config/initializers/determinator.rb
 
 require 'determinator/retrieve/routemaster'
+require 'determinator/cache/active_support_memory_store'
+
 Determinator.configure(
-  retrieval: Determinator::Retrieve::Routemaster.new(
-    discovery_url: 'https://flo.dev/'
-    retrieval_cache: ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
-  )
+  retrieval: Determinator::Retrieve::Routemaster.new(discovery_url: 'https://flo.dev/')
 )
+Determinator.retrieval_cache = Determinator::Cache::ActiveSupportMemoryStore.new(expires_in: 1.minute)
 Determinator.on_error(NewRelic::Agent.method(:notice_error))
 Determinator.on_missing_feature do |feature_name|
   STATSD.increment 'determinator.missing_feature', tags: ["feature:#{name}"]
@@ -106,6 +106,7 @@ end
 This configures the `Determinator.instance` with:
 
 - What **retrieval** mechanism should be used to get feature details
+- (recommended) How features should be **cached** as they're retrieved. This mechanism allows caching features _and_ missing features, so when a cache is configured a determination request for a missing feature on busy machines won't result in a thundering herd.
 - (optional) How **errors** should be reported
 - (optional) How **missing features** should be monitored (as they indicate something's up with your code or your set up!)
 
@@ -186,10 +187,6 @@ end
 ```
 
 * Check out [the specs for `RSpec::Determinator`](spec/rspec/determinator_spec.rb) to find out what you can do!
-
-### Retrieval Cache
-
-Determinator will function fully without a retrieval_cache set, although Determinator will produce 1 Redis query for every determination. By setting a `retrieval_cache` as an instance of `ActiveSupport::Cache::MemoryStore` (or equivalent) this can be reduced per application instance. This cache is not expired so *must* have a `expires_in` set, ideally to a short amount of time.
 
 ## Testing this library
 

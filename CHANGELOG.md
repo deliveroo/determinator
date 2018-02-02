@@ -1,5 +1,8 @@
 # HEAD
 
+Breaking change:
+- Changes retrieval caching so that 404s are cached as well as positive feature retrievals. This means that an unconfigured feature won't result in a thundering herd of requests to Florence. (#46)
+
 Feature:
 - Changes tests to use the [Determinator standard tests](https://github.com/deliveroo/determinator-standard-tests) (#41)
 - Supports the use of the 'single' bucket type for features, which allows (only) feature flags to be on or off, without any `id` or `guid` specified. (#41)

@@ -51,13 +51,21 @@ module Determinator
       @determination_callback = block
     end
 
+    # Allows configuration of the block which will cache features once they've been retrieved.
+    # Check classes within the `Determinator::Cache` module for preconfigured caches.
+    def retrieval_cache=(&block)
+      @retrieval_cache = block
+    end
+
     # Returns the feature with the given name as Determinator uses it. This is useful for
     # debugging issues with the retrieval mechanism which delivers features to Determinator.
     # @returns [Determinator::Feature,nil] The feature details Determinator would use for a determination right now.
     def feature_details(name)
-      instance.retrieval.retrieve(name)
+      with_retrieval_cache(name) { instance.retrieval.retrieve(name) }
     end
 
+    # Allows Determinator to track that an error has happened with determination
+    # @api private
     def notice_error(error)
       return unless @error_logger
 
@@ -65,6 +73,8 @@ module Determinator
       @error_logger.call(error)
     end
 
+    # Allows Determinator to track that a feature was requested but was missing
+    # @api private
     def notice_missing_feature(name)
       return unless @missing_feature_logger
 
@@ -74,6 +84,14 @@ module Determinator
     def notice_determination(id, guid, feature, determination)
       return unless @determination_callback
       @determination_callback.call(id, guid, feature, determination)
+    end
+
+    # Allows access to the chosen caching mechanism for any retrieval plugin.
+    # @api private
+    def with_retrieval_cache(name)
+      return yield unless @retrieval_cache.respond_to?(:call)
+
+      @retrieval_cache.call(name) { yield }
     end
   end
 end

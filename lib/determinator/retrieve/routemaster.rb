@@ -1,7 +1,6 @@
 require 'uri'
 require 'routemaster/drain/caching'
 require 'routemaster/responses/hateoas_response'
-require 'determinator/retrieve/null_cache'
 require 'determinator/serializers/json'
 
 module Determinator
@@ -19,21 +18,18 @@ module Determinator
       CALLBACK_PATH = (URI.parse(ENV['ROUTEMASTER_CALLBACK_URL']).path rescue '/events').freeze
 
       # @param :discovery_url [String] The bootstrap URL of the instance of Florence which defines Features.
-      def initialize(discovery_url:, retrieval_cache: NullCache.new)
+      def initialize(discovery_url:)
         client = ::Routemaster::APIClient.new(
           response_class: ::Routemaster::Responses::HateoasResponse
         )
-        @retrieval_cache = retrieval_cache
         @actor_service = client.discover(discovery_url)
-
       end
 
       # Retrieves and processes the feature that goes by the given name on this retrieval mechanism.
       # @return [Determinator::Feature,nil] The details of the specified feature
       def retrieve(name)
-        cached_feature_lookup(name) do
-          @actor_service.feature.show(name)
-        end
+        obj = @actor_service.feature.show(name)
+        Determinator::Serializers::JSON.load(obj.body.to_hash)
       rescue ::Routemaster::Errors::ResourceNotFound
         # Don't be noisy
         nil
@@ -51,17 +47,6 @@ module Determinator
 
       def routemaster_app
         @routemaster_app ||= ::Routemaster::Drain::Caching.new
-      end
-
-      def self.lookup_cache_key(feature_name)
-        "determinator_cache:#{feature_name}"
-      end
-
-      private
-
-      def cached_feature_lookup(feature_name)
-        obj = @retrieval_cache.fetch(self.class.lookup_cache_key(feature_name)){ yield }
-        Determinator::Serializers::JSON.load(obj.body.to_hash)
       end
     end
   end
