@@ -1,3 +1,9 @@
+# HEAD
+
+Feature:
+- Changes tests to use the [Determinator standard tests](https://github.com/deliveroo/determinator-standard-tests) (#41)
+- Supports the use of the 'single' bucket type for features, which allows (only) feature flags to be on or off, without any `id` or `guid` specified. (#41)
+
 # v0.12.1 (2018-02-01)
 
 Bug Fix:

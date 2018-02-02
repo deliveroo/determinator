@@ -2,6 +2,7 @@ require 'uri'
 require 'routemaster/drain/caching'
 require 'routemaster/responses/hateoas_response'
 require 'determinator/retrieve/null_cache'
+require 'determinator/serializers/json'
 
 module Determinator
   module Retrieve
@@ -59,59 +60,8 @@ module Determinator
       private
 
       def cached_feature_lookup(feature_name)
-        build_feature_from_api_response(
-          @retrieval_cache.fetch(self.class.lookup_cache_key(feature_name)){ yield }
-        )
-      end
-
-      def build_feature_from_api_response(obj)
-        Feature.new(
-          name:          obj.body.name,
-          identifier:    obj.body.identifier,
-          bucket_type:   obj.body.bucket_type,
-          active:        obj.body.active,
-          target_groups: target_groups_attribute(obj.body.target_groups),
-          variants:      obj.body.variants.to_h,
-          overrides:     overrides_attribute(obj.body.overrides),
-          winning_variant: obj.body.winning_variant,
-        )
-      end
-
-      def target_groups_attribute(target_groups)
-        target_groups.map do |tg|
-          TargetGroup.new(
-            rollout: tg.rollout,
-            constraints: constraints_attribute(tg.constraints)
-          )
-        end
-      end
-
-      def constraints_attribute(constraints)
-        # TODO when FLO-3 closed: no need for legacy guard
-        return legacy_constraints_attribute(constraints) unless constraints.respond_to?(:each_pair)
-        constraints
-      end
-
-      def legacy_constraints_attribute(constraints)
-        constraints.each_with_object({}) do |constraint, h|
-          if h[constraint.scope]
-            h[constraint.scope] = [*h[constraint.scope], constraint.identifier]
-          else
-            h[constraint.scope] = constraint.identifier
-          end
-        end
-      end
-
-      def overrides_attribute(overrides)
-        # TODO when FLO-3 closed: no need for legacy guard
-        return legacy_overrides_attribute(overrides) unless overrides.respond_to?(:each_pair)
-        overrides
-      end
-
-      def legacy_overrides_attribute(overrides)
-        overrides.each_with_object({}) do |override, h|
-          h[override[:user_id]] = override[:variant]
-        end
+        obj = @retrieval_cache.fetch(self.class.lookup_cache_key(feature_name)){ yield }
+        Determinator::Serializers::JSON.load(obj.body.to_hash)
       end
     end
   end
