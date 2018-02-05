@@ -1,4 +1,6 @@
-# HEAD
+# v1.0.0 (2018-02-05)
+
+⚠️ This release includes breaking changes ⚠️
 
 Breaking change:
 - Changes retrieval caching so that 404s are cached as well as positive feature retrievals. This means that an unconfigured feature won't result in a thundering herd of requests to Florence. (#46)
