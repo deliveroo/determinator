@@ -60,17 +60,17 @@ module Determinator
     def determinate_and_notice(name, id:, guid:, properties:)
       feature = Determinator.with_retrieval_cache(name) { retrieval.retrieve(name) }
 
+      if feature.nil?
+        Determinator.notice_missing_feature(name)
+        return false
+      end
+
       determinate(feature, id: id, guid: guid, properties: properties).tap do |determination|
         Determinator.notice_determination(id, guid, feature, determination)
       end
     end
 
     def determinate(feature, id:, guid:, properties:)
-      if feature.nil?
-        Determinator.notice_missing_feature(feature.name)
-        return false
-      end
-
       # Calling method can place constraints on the feature, eg. experiment only
       return false if block_given? && !yield(feature)
 

@@ -16,11 +16,7 @@ Determinator.on_missing_feature do |feature_name|
 end
 
 Determinator.on_determination do |id, guid, feature, determination|
-  if feature.experiment? && determination !== false
-    # YourTrackingSolution.record_variant_viewing(
-    #   user_id: id,
-    #   experiment_name: feature.name,
-    #   variant: determination
-    # )
+  if feature.experiment? && determination != false
+    puts "TODO: Track that user #{id}/#{guid} saw the #{determination} variant of '#{feature.name}' for analysis"
   end
 end
