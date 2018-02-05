@@ -1,9 +1,11 @@
 require 'determinator/retrieve/routemaster'
-require 'determinator/cache/active_support_memory_store'
+require 'active_support/cache'
 
 retrieval = Determinator::Retrieve::Routemaster.new(discovery_url: 'https://flo.dev/')
-Determinator.configure(retrieval: retrieval)
-Determinator.retrieval_cache = Determinator::Cache::ActiveSupportMemoryStore.new(expires_in: 1.minute)
+feature_cache = Determinator::Cache::FetchWrapper.new(
+  ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
+)
+Determinator.configure(retrieval: retrieval, feature_cache: feature_cache)
 
 Determinator.on_error do |error|
   # NewRelic::Agent.notice_error(error)

@@ -1,16 +1,6 @@
 require 'spec_helper'
-require 'determinator/cache/active_support_memory_store'
 
-RSpec.describe Determinator::Cache::ActiveSupportMemoryStore do
-  describe '::initialize' do
-    subject(:described_instance) { described_class.new(some: 'arguments') }
-
-    it 'should pass all arguments to an ActiveSupport::Cache::MemoryStore initializer' do
-      expect(ActiveSupport::Cache::MemoryStore).to receive(:new).with(some: 'arguments')
-      subject
-    end
-  end
-
+RSpec.describe Determinator::Cache::FetchWrapper do
   describe '#call' do
     subject(:described_method) do
       @retrieval_called = false
@@ -19,7 +9,8 @@ RSpec.describe Determinator::Cache::ActiveSupportMemoryStore do
         retrieval_response
       end
     end
-    let(:described_instance) { described_class.new(expires_in: 60) }
+    let(:described_instance) { described_class.new(cache) }
+    let(:cache) { ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute) }
     let(:feature) { FactoryGirl.create(:feature) }
 
     context 'when the feature exists' do

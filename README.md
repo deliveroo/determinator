@@ -81,12 +81,14 @@ Determinator requires a initialiser block somewhere in your application's boot p
 # config/initializers/determinator.rb
 
 require 'determinator/retrieve/routemaster'
-require 'determinator/cache/active_support_memory_store'
+require 'active_support/cache'
 
 Determinator.configure(
-  retrieval: Determinator::Retrieve::Routemaster.new(discovery_url: 'https://flo.dev/')
+  retrieval: Determinator::Retrieve::Routemaster.new(discovery_url: 'https://flo.dev/'),
+  feature_cache: Determinator::Cache::FetchWrapper.new(
+    ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
+  )
 )
-Determinator.retrieval_cache = Determinator::Cache::ActiveSupportMemoryStore.new(expires_in: 1.minute)
 Determinator.on_error(NewRelic::Agent.method(:notice_error))
 Determinator.on_missing_feature do |feature_name|
   STATSD.increment 'determinator.missing_feature', tags: ["feature:#{name}"]

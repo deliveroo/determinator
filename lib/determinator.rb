@@ -4,15 +4,18 @@ require 'determinator/feature'
 require 'determinator/target_group'
 require 'determinator/retrieve/routemaster'
 require 'determinator/retrieve/null_retriever'
+require 'determinator/cache/fetch_wrapper'
 
 module Determinator
   class << self
     # @param :retrieval [Determinator::Retrieve::Routemaster] A retrieval instance for Features
     # @param :errors [#call, nil] a proc, accepting an error, which will be called with any errors which occur while determinating
     # @param :missing_feature [#call, nil] a proc, accepting a feature name, which will be called any time a feature is requested but isn't available
-    def configure(retrieval:, errors: nil, missing_feature: nil)
+    # @param :feature_cache [#call, nil] a caching proc, accepting a feature name, which will return the named feature or yield (and store) if not available
+    def configure(retrieval:, errors: nil, missing_feature: nil, feature_cache: nil)
       self.on_error_logger(&errors) if errors
       self.on_missing_feature(&missing_feature) if missing_feature
+      @feature_cache = feature_cache if feature_cache.respond_to?(:call)
       @instance = Control.new(retrieval: retrieval)
     end
 
@@ -51,12 +54,6 @@ module Determinator
       @determination_callback = block
     end
 
-    # Allows configuration of the block which will cache features once they've been retrieved.
-    # Check classes within the `Determinator::Cache` module for preconfigured caches.
-    def retrieval_cache=(&block)
-      @retrieval_cache = block
-    end
-
     # Returns the feature with the given name as Determinator uses it. This is useful for
     # debugging issues with the retrieval mechanism which delivers features to Determinator.
     # @returns [Determinator::Feature,nil] The feature details Determinator would use for a determination right now.
@@ -89,9 +86,9 @@ module Determinator
     # Allows access to the chosen caching mechanism for any retrieval plugin.
     # @api private
     def with_retrieval_cache(name)
-      return yield unless @retrieval_cache.respond_to?(:call)
+      return yield unless @feature_cache.respond_to?(:call)
 
-      @retrieval_cache.call(name) { yield }
+      @feature_cache.call(name) { yield }
     end
   end
 end
