@@ -4,15 +4,18 @@ require 'determinator/feature'
 require 'determinator/target_group'
 require 'determinator/retrieve/routemaster'
 require 'determinator/retrieve/null_retriever'
+require 'determinator/cache/fetch_wrapper'
 
 module Determinator
   class << self
     # @param :retrieval [Determinator::Retrieve::Routemaster] A retrieval instance for Features
     # @param :errors [#call, nil] a proc, accepting an error, which will be called with any errors which occur while determinating
     # @param :missing_feature [#call, nil] a proc, accepting a feature name, which will be called any time a feature is requested but isn't available
-    def configure(retrieval:, errors: nil, missing_feature: nil)
+    # @param :feature_cache [#call, nil] a caching proc, accepting a feature name, which will return the named feature or yield (and store) if not available
+    def configure(retrieval:, errors: nil, missing_feature: nil, feature_cache: nil)
       self.on_error_logger(&errors) if errors
       self.on_missing_feature(&missing_feature) if missing_feature
+      @feature_cache = feature_cache if feature_cache.respond_to?(:call)
       @instance = Control.new(retrieval: retrieval)
     end
 
@@ -55,9 +58,11 @@ module Determinator
     # debugging issues with the retrieval mechanism which delivers features to Determinator.
     # @returns [Determinator::Feature,nil] The feature details Determinator would use for a determination right now.
     def feature_details(name)
-      instance.retrieval.retrieve(name)
+      with_retrieval_cache(name) { instance.retrieval.retrieve(name) }
     end
 
+    # Allows Determinator to track that an error has happened with determination
+    # @api private
     def notice_error(error)
       return unless @error_logger
 
@@ -65,6 +70,8 @@ module Determinator
       @error_logger.call(error)
     end
 
+    # Allows Determinator to track that a feature was requested but was missing
+    # @api private
     def notice_missing_feature(name)
       return unless @missing_feature_logger
 
@@ -74,6 +81,14 @@ module Determinator
     def notice_determination(id, guid, feature, determination)
       return unless @determination_callback
       @determination_callback.call(id, guid, feature, determination)
+    end
+
+    # Allows access to the chosen caching mechanism for any retrieval plugin.
+    # @api private
+    def with_retrieval_cache(name)
+      return yield unless @feature_cache.respond_to?(:call)
+
+      @feature_cache.call(name) { yield }
     end
   end
 end

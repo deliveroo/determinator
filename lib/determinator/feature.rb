@@ -53,6 +53,10 @@ module Determinator
       valid_outcomes.include?(outcome) ? outcome : nil
     end
 
+    def ==(other)
+      Marshal.dump(self) == Marshal.dump(other)
+    end
+
     private
 
     attr_reader :overrides
