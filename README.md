@@ -179,10 +179,21 @@ RSpec.describe "something", :determinator_support do
     forced_determination(:my_lazyexperiment, :some_lazy_variable)
     let(:some_lazy_variable) { 'variant_b' }
 
+    forced_determination(:my_targeted_feature_flag, true, only_for: { employee: true })
+    forced_determination(:my_targeted_feature_flag, false, only_for: { id: 12345 })
+
     it "uses forced_determination" do
-      expect(Determinator.instance.feature_flag_on?(:my_feature_flag)).to eq(true)
-      expect(Determinator.instance.which_variant(:my_experiment)).to eq("variant_a")
-      expect(Determinator.instance.which_variant(:my_lazy_experiment)).to eq("variant_b")
+      determinator = Determinator.for_actor(id: 1)
+
+      expect(determinator.feature_flag_on?(:my_feature_flag)).to be true
+      expect(determinator.which_variant(:my_experiment)).to eq("variant_a")
+      expect(determinator.which_variant(:my_lazy_experiment)).to eq("variant_b")
+
+      expect(determinator.feature_flag_on?(:my_targeted_feature_flag, properties: { employee: false })).to be false
+      expect(determinator.feature_flag_on?(:my_targeted_feature_flag, properties: { employee: true })).to be true
+
+      # The last forced determination takes precedence
+      expect(Determinator.instance.feature_flag_on?(:my_targeted_feature_flag, id: 12345, properties: { employee: true })).to be false
     end
   end
 end

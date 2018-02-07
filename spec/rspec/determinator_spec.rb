@@ -35,6 +35,20 @@ describe RSpec::Determinator, :determinator_support do
       it { should eq 'outcome' }
     end
 
+    context 'when forcing a determination for actors with specific properties that match when the forced determination needs to be normalized' do
+      forced_determination(:my_experiment, 'outcome', only_for: { 'property' => 'correct' })
+      let(:properties) { { property: 'correct' } }
+
+      it { should eq 'outcome' }
+    end
+
+    context 'when forcing a determination for actors with specific properties that match when the determination needs to be normalized' do
+      forced_determination(:my_experiment, 'outcome', only_for: { property: 'correct' })
+      let(:properties) { { 'property' => 'correct' } }
+
+      it { should eq 'outcome' }
+    end
+
     context 'when forcing a determination for actors with specific properties that match when using an example-scoped variable for constraints' do
       forced_determination(:my_experiment, 'outcome', only_for: :properties)
       let(:properties) { { property: 'correct' } }
@@ -62,7 +76,7 @@ describe RSpec::Determinator, :determinator_support do
 
       let(:properties) { { property: 'correct', extra: 'also present' } }
 
-      it { should eq 'first outcome' }
+      it { should eq 'second outcome' }
     end
 
     context 'when using an ActorControl proxy' do

@@ -1,3 +1,13 @@
+# v1.1.0 (2018-02-07)
+
+⚠️ This release includes breaking changes to `RSpec::Determinator` ⚠️
+
+Breaking change:
+- If two `forced_determination`s are made within one rspec test case, it is now the _last_ one that takes precedence (not the first). (#47)
+
+Bug fix:
+- `forced_determination`s which are called with differently typed parameters (eg. integer vs. string, boolean vs. string) will now work in the same way that real determination will. (#47)
+
 # v1.0.0 (2018-02-05)
 
 ⚠️ This release includes breaking changes ⚠️
