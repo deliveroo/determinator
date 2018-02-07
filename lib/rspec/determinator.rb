@@ -45,14 +45,14 @@ module RSpec
       end
 
       def mock_result(name, result, only_for: {})
-        @mocked_results[name.to_s][only_for] = result
+        @mocked_results[name.to_s][normalize_properties(only_for)] = result
       end
 
       def fake_determinate(name, id: nil, guid: nil, properties: {})
         properties[:id] = id if id
         properties[:guid] = guid if guid
 
-        outcome_for_feature_given_properties(name.to_s, properties)
+        outcome_for_feature_given_properties(name.to_s, normalize_properties(properties))
       end
       alias_method :feature_flag_on?, :fake_determinate
       alias_method :which_variant, :fake_determinate
@@ -62,11 +62,18 @@ module RSpec
       def outcome_for_feature_given_properties(feature_name, requirements)
         req_array = requirements.to_a
 
-        _, forced = @mocked_results[feature_name].find do |given, outcome|
+        keys_in_priority_order = @mocked_results[feature_name].keys.reverse
+        key = keys_in_priority_order.find do |given|
           (given.to_a - req_array).empty?
         end
 
-        forced || false
+        @mocked_results[feature_name][key] || false
+      end
+
+      def normalize_properties(properties)
+        properties.each_with_object({}) do |(key, value), hash|
+          hash[key.to_s] = [*value].map(&:to_s)
+        end
       end
     end
   end
