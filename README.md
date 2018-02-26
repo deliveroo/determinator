@@ -91,7 +91,7 @@ Determinator.configure(
 )
 Determinator.on_error(NewRelic::Agent.method(:notice_error))
 Determinator.on_missing_feature do |feature_name|
-  STATSD.increment 'determinator.missing_feature', tags: ["feature:#{name}"]
+  STATSD.increment 'determinator.missing_feature', tags: ["feature:#{feature_name}"]
 end
 
 Determinator.on_determination do |id, guid, feature, determination|
