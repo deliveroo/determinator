@@ -1,3 +1,8 @@
+# HEAD
+
+Bug fix:
+- Ensures the `configure` method calls the correct method when a legacy error proc is given as a parameter. (#49)
+
 # v1.1.0 (2018-02-07)
 
 ⚠️ This release includes breaking changes to `RSpec::Determinator` ⚠️
