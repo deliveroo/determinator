@@ -1,4 +1,4 @@
-# HEAD
+# v1.1.1 (2018-02-27)
 
 Bug fix:
 - Ensures the `configure` method calls the correct method when a legacy error proc is given as a parameter. (#49)
