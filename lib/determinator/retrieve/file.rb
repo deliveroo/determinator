@@ -12,7 +12,7 @@ module Determinator
       end
 
       def retrieve(feature_id)
-        feature = @root.join(feature_id)
+        feature = @root.join(feature_id.to_s)
         return unless feature.exist?
         @serializer.load(feature.read)
       rescue => e
