@@ -1,4 +1,4 @@
-# v1.1.1 (2018-03-07)
+# v1.1.2 (2018-03-07)
 
 Bug fix:
 - Ensures that `Determiantor::Retrievve::File` tolerates feature names that quack `#to_s`. (#50)
