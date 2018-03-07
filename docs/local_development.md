@@ -88,3 +88,30 @@ determinator.which_variant(:my_experiment, id: 123)
 ```
 
 More information can be found on the [Fake Florence](https://github.com/deliveroo/fake_florence) project page.
+
+## File support for local
+
+Alternatively, Determinator can be configured to read from  a local file store.
+
+Add 'local_feature_flags' to your .gitignore file and the following to your determinator setup initializer.
+
+```ruby
+# /config/initializers/determinator.rb
+require 'determinator/retrieve/file'
+retrieval = if Rails.env.development?
+              Determinator::Retrieve::File.new(
+                root: Rails.root.join('local_feature_flags')
+              )
+            else
+              #Your regular production config
+            end
+
+Determinator.configure(retrieval: retrieval)
+```
+
+Then add a your feature definitions as a json file (without an extension) to the `local_feature_flags` folder.
+
+```ruby
+  # checks /local_feature_flags/deliveroo_does
+  Determinator.instance.feature_flag_on?('deliveroo_does', id: 5)
+```
