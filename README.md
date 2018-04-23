@@ -1,6 +1,8 @@
 # Determinator
 
-A gem that works with _Florence_ to deterministically calculate whether an **actor** should have a feature flag turned on or off, or which variant they should see in an experiment.
+A gem that works with Florence to deterministically calculate whether an **actor** should have a feature flag turned on or off, or which variant they should see in an experiment. Florence's UI is currently hosted within [actor-tracking](https://github.com/deliveroo/actor-tracking).
+
+You can make changes to your feature flags and experiments within Florence. If you work at Deliveroo you can find Florence UI at: https://actor-tracking.deliveroo.net/florence
 
 ![Arnold Schwarzenegger might say "Come with me if you want to experiment" if he played The Determinator instead of The Terminator.](docs/img/determinator.jpg)
 
