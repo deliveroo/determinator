@@ -1,6 +1,6 @@
 # Terminology & Background
 
-**Florence** is a suite of tools which help run experiments and feature flags (_collectively called **features**_), **Determinator** is the client-side component which implements the algorithm for figuring out what to show to whom.
+**Florence** is a suite of tools which help run experiments and feature flags (_collectively called **features**_), **Determinator** is the client-side component which implements the algorithm for figuring out what to show to whom. The server-side component can be found in [actor-tracking](https://github.com/deliveroo/actor-tracking).
 
 **Feature flags** are used as a way to switch on and off functionality for specific actors across an entire ecosystem, where an **actor** might be a customer, a rider, or any identifiable agent using those systems.
 
