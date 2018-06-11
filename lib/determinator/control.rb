@@ -135,7 +135,7 @@ module Determinator
 
         raise ArgumentError, 'An ID or GUID must always be given for Fallback bucketed features'
       when :single
-        'all'
+        SecureRandom.hex(64)
       else
         Determinator.notice_error "Cannot process the '#{feature.bucket_type}' bucket type found in #{feature.name}"
       end
