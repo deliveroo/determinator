@@ -1,3 +1,8 @@
+# v1.2.0 (2018-06-12)
+
+Feature:
+- Adds to how `single` bucketed features operate. Now rollouts imply random determination, though 0% rollouts and 100% rollouts remain representing no-one and everyone respectively, ensuring that this change is backward compatible. (#52)
+
 # v1.1.2 (2018-03-07)
 
 Bug fix:
