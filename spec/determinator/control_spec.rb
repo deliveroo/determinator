@@ -1,5 +1,6 @@
 require "spec_helper"
 require 'determinator/retrieve/file'
+require 'set'
 
 describe Determinator::Control do
   context "determinator-standard-tests" do
@@ -49,6 +50,30 @@ describe Determinator::Control do
             end
           end
         end
+      end
+    end
+
+    context 'single bucketed, half rollout features should be on or off, randomly, for different calls' do
+      let(:feature_name) { 'feature_flags/simple/half_rollout_single.json' }
+      # standard deviations of confidence. 4 = 99.993; One in ~14k runs will be a false result
+      let(:z) { 4 }
+      # Acceptable error margin; 49/51 is acceptable as 50/50
+      let(:e) { 0.01 }
+      # n = Z^2 / 4 * E^2 (https://en.wikipedia.org/wiki/Checking_whether_a_coin_is_fair#Estimator_of_true_probability)
+      let(:determinations) { ((z * z) / (4 * e * e)).ceil }
+      # Given the number of determinations, what's the tolerable distance from exactly 50/50
+      let(:leeway) { determinations * e }
+
+      it 'should randomly give true or false results at different times' do
+        totals = determinations.times.with_object({}) do |_, tots|
+          outcome = determinator_instance.feature_flag_on?(feature_name)
+          tots[outcome] ||= 0
+          tots[outcome] += 1
+        end
+
+        expect(totals.keys).to contain_exactly(true, false)
+        expect(totals[true]).to be_within(leeway).of(determinations / 2)
+        expect(totals[false]).to be_within(leeway).of(determinations / 2)
       end
     end
   end
