@@ -1,3 +1,5 @@
+require 'faraday'
+
 module Determinator
   module Retrieve
     # A class which loads features from Dynaconf server

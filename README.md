@@ -82,11 +82,11 @@ Determinator requires a initialiser block somewhere in your application's boot p
 ```ruby
 # config/initializers/determinator.rb
 
-require 'determinator/retrieve/routemaster'
+require 'determinator/retrieve/dynaconf'
 require 'active_support/cache'
 
 Determinator.configure(
-  retrieval: Determinator::Retrieve::Routemaster.new(discovery_url: 'https://flo.dev/'),
+  retrieval: Determinator::Retrieve::Dynaconf.new(host: 'localhost:2345'),
   feature_cache: Determinator::Cache::FetchWrapper.new(
     ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
   )

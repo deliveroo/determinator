@@ -2,9 +2,8 @@ require 'determinator/version'
 require 'determinator/control'
 require 'determinator/feature'
 require 'determinator/target_group'
-require 'determinator/retrieve/routemaster'
-require 'determinator/retrieve/null_retriever'
 require 'determinator/cache/fetch_wrapper'
+require 'determinator/serializers/json'
 
 module Determinator
   class << self

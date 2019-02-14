@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'determinator/retrieve/file'
+require 'tmpdir'
 
 RSpec.describe Determinator::Retrieve::File do
   let(:described_instance) { described_class.new(root: dir) }

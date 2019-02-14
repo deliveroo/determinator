@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'active_support/cache'
 
 RSpec.describe Determinator::Cache::FetchWrapper do
   describe '#call' do

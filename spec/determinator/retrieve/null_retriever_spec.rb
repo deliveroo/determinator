@@ -1,4 +1,5 @@
-require "spec_helper"
+require 'spec_helper'
+require 'determinator/retrieve/null_retriever'
 
 describe Determinator::Retrieve::NullRetriever do
   let(:discovery_url) { '' }
