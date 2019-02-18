@@ -3,7 +3,7 @@ require 'determinator/retrieve/dynaconf'
 
 RSpec.describe Determinator::Retrieve::Dynaconf do
   describe '#retrieve' do
-    let(:host) { 'DYNACONF_HOST' }
+    let(:base_url) { 'http://DYNACONF_HOST:PORT' }
     let(:feature_id) { 'some-feature' }
     let(:feature_json) { {
       name: "Feature one",
@@ -17,7 +17,7 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
       overrides: {}
     } }
     let(:client) { instance_double(Faraday::Connection, get: nil) }
-    let(:expected_url) { "http://#{host}/scopes/florence-#{feature_id}/feature" }
+    let(:expected_url) { "#{base_url}/scopes/florence-#{feature_id}/feature" }
 
     shared_examples 'retrieve tests' do
       context 'when the feature is found' do
@@ -54,7 +54,7 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
     end
 
     context 'when client is not injected' do
-      subject(:retrieve) { described_class.new(host: host).retrieve(feature_id) }
+      subject(:retrieve) { described_class.new(base_url: base_url).retrieve(feature_id) }
 
       before do
         allow(Faraday).to receive(:new).and_return(client)
@@ -64,7 +64,7 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
     end
 
     context 'when client is injected' do
-      subject(:retrieve) { described_class.new(host: host, client: client).retrieve(feature_id) }
+      subject(:retrieve) { described_class.new(base_url: base_url, client: client).retrieve(feature_id) }
 
       include_examples 'retrieve tests'
     end

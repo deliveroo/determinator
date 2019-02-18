@@ -4,15 +4,15 @@ module Determinator
   module Retrieve
     # A class which loads features from Dynaconf server
     class Dynaconf
-      # @param :host [String] The host for local Dynaconf server
+      # @param :base [String] The protocol, host and port for local Dynaconf server
       # @param :client [String] Faraday client instance, defaults to a new instance
-      def initialize(host:, client: default_client)
-        @host = host
+      def initialize(base_url:, client: default_client)
+        @base_url = base_url
         @client = client
       end
 
       def retrieve(feature_id)
-        url = "http://#{@host}/scopes/florence-#{feature_id}/feature"
+        url = "#{@base_url}/scopes/florence-#{feature_id}/feature"
 
         payload = @client.get(url).body
         Determinator::Serializers::JSON.load(payload)
