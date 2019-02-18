@@ -1,3 +1,11 @@
+# v2.0.0 (2019-02-19)
+
+Breaking change:
+- Removes routemaster-drain support, the gem is also no longer a dependency. (#55)
+
+Feature:
+- Adds retriever for Dynaconf. (#55)
+
 # v1.2.0 (2018-06-12)
 
 Feature:
