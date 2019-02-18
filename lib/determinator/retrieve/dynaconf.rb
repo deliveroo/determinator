@@ -14,14 +14,20 @@ module Determinator
       def retrieve(feature_id)
         url = "#{@base_url}/scopes/florence-#{feature_id}/feature"
 
-        payload = @client.get(url).body
-        Determinator::Serializers::JSON.load(payload)
+        response = get(url)
+        Determinator::Serializers::JSON.load(response.body) if response.status == 200
       rescue => e
         Determinator.notice_error(e)
         nil
       end
 
       private
+
+      def get(url)
+        @client.get do |request|
+          request.url(url)
+        end
+      end
 
       def default_client
         Faraday.new
