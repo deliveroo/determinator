@@ -4,7 +4,10 @@ require 'webmock/rspec'
 
 RSpec.describe Determinator::Retrieve::Dynaconf do
   describe '#retrieve' do
+    subject(:retrieve) { described_class.new(params).retrieve(feature_id) }
+
     let(:base_url) { 'http://DYNACONF_HOST:4343' }
+    let(:service_name) { 'MY-SERVICE' }
     let(:feature_id) { 'some-feature' }
     let(:feature_json) { {
       name: "Feature one",
@@ -22,7 +25,9 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
     shared_examples 'retrieve tests' do
       before do
         allow(Determinator).to receive(:notice_error)
-        stub_request(:get, expected_url).to_return(status: response_status, body: feature_json.to_json)
+        stub_request(:get, expected_url).
+          with(headers: { 'User-Agent': "Determinator v#{Determinator::VERSION} - #{service_name}" }).
+          to_return(status: response_status, body: feature_json.to_json)
       end
 
       context 'when the feature is found' do
@@ -66,13 +71,13 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
     end
 
     context 'when client is not injected' do
-      subject(:retrieve) { described_class.new(base_url: base_url).retrieve(feature_id) }
+      let(:params) { { base_url: base_url, service_name: service_name } }
 
       include_examples 'retrieve tests'
     end
 
     context 'when client is injected' do
-      subject(:retrieve) { described_class.new(base_url: base_url, client: client).retrieve(feature_id) }
+      let(:params) { { base_url: base_url, service_name: service_name, client: client } }
 
       context 'when the client is a Faraday connection' do
         let(:client) { Faraday.new }
