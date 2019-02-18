@@ -1,7 +1,7 @@
-require 'determinator/retrieve/routemaster'
+require 'determinator/retrieve/dynaconf'
 require 'active_support/cache'
 
-retrieval = Determinator::Retrieve::Routemaster.new(discovery_url: 'https://flo.dev/')
+retrieval = Determinator::Retrieve::Dynaconf.new(host: 'localhost:2345')
 feature_cache = Determinator::Cache::FetchWrapper.new(
   ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
 )

@@ -1,0 +1,78 @@
+# To update the build configuration, edit the "builds" array below and run:
+# erb .circleci/config.yml.erb > .circleci/config.yml
+
+version: 2
+jobs:
+  
+  build_2.4:
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
+
+      - run:
+          name: Bundle Install
+          command: bundle install
+
+      - run:
+          name: Include standard tests
+          command: git submodule update --init
+
+      - run:
+          name: Run rspec
+          command: |
+            bundle exec rspec --format documentation
+
+    
+  build_2.5:
+    docker:
+      - image: circleci/ruby:2.5
+    steps:
+      - checkout
+
+      - run:
+          name: Bundle Install
+          command: bundle install
+
+      - run:
+          name: Include standard tests
+          command: git submodule update --init
+
+      - run:
+          name: Run rspec
+          command: |
+            bundle exec rspec --format documentation
+
+    
+  build_2.6:
+    docker:
+      - image: circleci/ruby:2.6
+    steps:
+      - checkout
+
+      - run:
+          name: Bundle Install
+          command: bundle install
+
+      - run:
+          name: Include standard tests
+          command: git submodule update --init
+
+      - run:
+          name: Run rspec
+          command: |
+            bundle exec rspec --format documentation
+
+    
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      
+      - build_2.4
+      
+      - build_2.5
+      
+      - build_2.6
+      
