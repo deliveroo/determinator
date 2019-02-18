@@ -7,6 +7,8 @@ module Determinator
       # @param :base [String] The protocol, host and port for local Dynaconf server
       # @param :client [String] Faraday client instance, defaults to a new instance
       def initialize(base_url:, client: default_client)
+        raise ArgumentError, "client must be a Faraday::Connection" unless client.is_a?(Faraday::Connection)
+
         @base_url = base_url
         @client = client
       end

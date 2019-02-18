@@ -17,7 +17,6 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
       active: true,
       overrides: {}
     } }
-    let(:client) { Faraday.new }
     let(:expected_url) { "#{base_url}/scopes/florence-#{feature_id}/feature" }
 
     shared_examples 'retrieve tests' do
@@ -75,7 +74,19 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
     context 'when client is injected' do
       subject(:retrieve) { described_class.new(base_url: base_url, client: client).retrieve(feature_id) }
 
-      include_examples 'retrieve tests'
+      context 'when the client is a Faraday connection' do
+        let(:client) { Faraday.new }
+
+        include_examples 'retrieve tests'
+      end
+
+      context 'when the client is not a Faraday connection' do
+        let(:client) { 'CLIENT' }
+
+        it 'raises an ArgumentError' do
+          expect { retrieve }.to raise_error(ArgumentError)
+        end
+      end
     end
   end
 end
