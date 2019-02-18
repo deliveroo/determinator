@@ -26,7 +26,7 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
       before do
         allow(Determinator).to receive(:notice_error)
         stub_request(:get, expected_url).
-          with(headers: { 'User-Agent': "Determinator v#{Determinator::VERSION} - #{service_name}" }).
+          with(headers: { 'User-Agent': "Determinator/Ruby v#{Determinator::VERSION} - #{service_name}" }).
           to_return(status: response_status, body: feature_json.to_json)
       end
 
