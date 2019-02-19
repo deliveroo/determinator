@@ -30,8 +30,12 @@ module Determinator
 
         @client.get do |request|
           request.url(url)
-          request['User-Agent'] = "Determinator v#{Determinator::VERSION} - #{@service_name}"
+          request['User-Agent'] = user_agent
         end
+      end
+
+      def user_agent
+        @user_agent ||= "Determinator/Ruby v#{Determinator::VERSION} - #{@service_name}".freeze
       end
 
       def default_client

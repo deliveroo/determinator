@@ -1,7 +1,7 @@
 require 'determinator/retrieve/dynaconf'
 require 'active_support/cache'
 
-retrieval = Determinator::Retrieve::Dynaconf.new(host: 'localhost:2345')
+retrieval = Determinator::Retrieve::Dynaconf.new(base_url: 'http://localhost:2345', service_name: 'determinator-rails')
 feature_cache = Determinator::Cache::FetchWrapper.new(
   ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
 )
