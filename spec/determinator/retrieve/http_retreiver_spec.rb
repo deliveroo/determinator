@@ -1,12 +1,14 @@
-require 'determinator/retrieve/dynaconf'
+require 'determinator/retrieve/http_retriever'
 require 'spec_helper'
 require 'webmock/rspec'
 
-RSpec.describe Determinator::Retrieve::Dynaconf do
+RSpec.describe Determinator::Retrieve::HttpRetriever do
   describe '#retrieve' do
     subject(:retrieve) { described_class.new(params).retrieve(feature_id) }
-
-    let(:base_url) { 'http://DYNACONF_HOST:4343' }
+    let(:client){
+      Faraday.new(base_url)
+    }
+    let(:base_url) { 'http://actortracking.dev' }
     let(:service_name) { 'MY-SERVICE' }
     let(:feature_id) { 'some-feature' }
     let(:feature_json) { {
@@ -20,20 +22,12 @@ RSpec.describe Determinator::Retrieve::Dynaconf do
       active: true,
       overrides: {}
     } }
-    let(:expected_url) { "#{base_url}/scopes/florence-#{feature_id}/feature" }
-
-    context 'when client is not injected' do
-      let(:params) { { base_url: base_url, service_name: service_name } }
-
-      include_examples 'retrieve tests'
-    end
+    let(:expected_url) { "#{base_url}/features/#{feature_id}" }
 
     context 'when client is injected' do
-      let(:params) { { base_url: base_url, service_name: service_name, client: client } }
+      let(:params) { { connection: client } }
 
       context 'when the client is a Faraday connection' do
-        let(:client) { Faraday.new }
-
         include_examples 'retrieve tests'
       end
 

@@ -7,6 +7,7 @@ require 'determinator/serializers/json'
 
 module Determinator
   class << self
+    attr_reader :feature_cache, :retrieval
     # @param :retrieval [Determinator::Retrieve::Routemaster] A retrieval instance for Features
     # @param :errors [#call, nil] a proc, accepting an error, which will be called with any errors which occur while determinating
     # @param :missing_feature [#call, nil] a proc, accepting a feature name, which will be called any time a feature is requested but isn't available
@@ -15,6 +16,7 @@ module Determinator
       self.on_error(&errors) if errors
       self.on_missing_feature(&missing_feature) if missing_feature
       @feature_cache = feature_cache if feature_cache.respond_to?(:call)
+      @retrieval = retrieval
       @instance = Control.new(retrieval: retrieval)
     end
 
@@ -88,6 +90,10 @@ module Determinator
       return yield unless @feature_cache.respond_to?(:call)
 
       @feature_cache.call(name) { yield }
+    end
+
+    def invalidate_cache(name)
+      @feature_cache.expire(name)
     end
   end
 end
