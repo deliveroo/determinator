@@ -116,6 +116,46 @@ This configures the `Determinator.instance` with:
 
 You may also want to configure a `determinator` helper method inside your web request scope, see below for more information.
 
+### Using over http
+
+Using the HttpRetriever will cause a request to be sent to actor tracking every time a feature is checked. The impact of this can be mitigated somewhat by having a short lived memory cache, but we're limited in
+the length of time we can cache for without some way of notifying the cache that an item has changed.
+
+```ruby
+faraday_connection = Faraday.new("http://actor-tracking.local") do |conn|
+  conn.headers['User-Agent'] = "Determinator - my service name"
+  conn.basic_auth('my-service-name', 'actor-tracking-token')
+  conn.adapter Faraday.default_adapter
+end
+
+Determinator.configure(
+  retrieval: Determinator::Retrieve::HttpRetriever.new(
+    connection: faraday_connection,
+  ),
+  feature_cache: Determinator::Cache::FetchWrapper.new(
+    ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute),
+    ActiveSupport::Cache::RedisCacheStore.new
+  )
+)
+```
+
+In this set up we've got two caches - some limited local cache and a larger redis cache that's shared between instances. The memory cache ensure that we're able to perform determination lookups in tight loops without excessive calls to redis.
+
+We don't set a TTL on the redis cache (although we could) because we intend to expire the caches manually when we receive an update from our event bus:
+
+```ruby
+  feature_name = Determinator.retrieval.get_name("http://actor-tracking.local/features/some_feature")
+  Determinator.feature_cache.expire(feature_name)
+```
+
+or in instances where the event bus provides a full feature object with a name it's simply:
+
+```ruby
+  Determinator.feature_cache.expire(deserialized_kafka_feature.name)
+```
+
+This will expire both the limited local cache and the larger shared cache.
+
 ## Further Usage
 
 Once this is done you can ask for a determination like this:
@@ -153,12 +193,6 @@ determinator.which_variant(:my_experiment_name)
 ```
 
 Check the example Rails app in the `examples` directory for more information on how to make use of this gem.
-
-### Routemaster
-
-Determinator's [Routemaster](https://github.com/deliveroo/routemaster) integration requires your application to be subscribed to the a `features` topic.
-
-The drain must expire the routemaster cache on receipt of events, making use of  `Routemaster::Drain::CacheBusting.new` or similar is recommended.
 
 ### Using Determinator in RSpec
 

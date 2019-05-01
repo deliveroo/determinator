@@ -2,18 +2,12 @@ require 'spec_helper'
 require 'active_support/cache'
 
 RSpec.describe Determinator::Cache::FetchWrapper do
-  describe '#call' do
-    subject(:described_method) do
-      @retrieval_called = false
-      described_instance.call(feature.name) do
-        @retrieval_called = true
-        retrieval_response
-      end
-    end
-    let(:described_instance) { described_class.new(cache) }
-    let(:cache) { ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute) }
-    let(:feature) { FactoryGirl.create(:feature) }
-
+  let(:described_instance) { described_class.new(*caches) }
+  let(:feature) { FactoryGirl.create(:feature) }
+  subject(:described_method) do
+    described_instance.call(feature.name){ retrieval_response }
+  end
+  shared_examples "a cache" do
     context 'when the feature exists' do
       let(:retrieval_response) { feature }
 
@@ -22,8 +16,7 @@ RSpec.describe Determinator::Cache::FetchWrapper do
 
         it { should eq retrieval_response }
         it 'should have performed a retrieval' do
-          subject
-          expect(@retrieval_called).to be true
+          expect{|b| described_instance.call(feature.name, &b)}.to yield_control
         end
       end
 
@@ -34,8 +27,7 @@ RSpec.describe Determinator::Cache::FetchWrapper do
 
         it { should eq retrieval_response }
         it 'should not have performed a retrieval' do
-          subject
-          expect(@retrieval_called).to be false
+          expect{|b| described_instance.call(feature.name, &b)}.not_to yield_control
         end
       end
     end
@@ -48,8 +40,7 @@ RSpec.describe Determinator::Cache::FetchWrapper do
 
         it { should eq retrieval_response }
         it 'should have performed a retrieval' do
-          subject
-          expect(@retrieval_called).to be true
+          expect{|b| described_instance.call(feature.name, &b)}.to yield_control
         end
       end
 
@@ -60,10 +51,46 @@ RSpec.describe Determinator::Cache::FetchWrapper do
 
         it { should eq retrieval_response }
         it 'should not have performed a retrieval' do
-          subject
-          expect(@retrieval_called).to be false
+          expect{|b| described_instance.call(feature.name, &b)}.not_to yield_control
         end
       end
     end
   end
+
+  describe "with two caches" do
+    let(:caches) {
+      [
+        ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute),
+        ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
+      ]
+    }
+    it_behaves_like "a cache"
+
+    context "when an item is in the lower cache" do
+      before do
+        caches[1].write(described_instance.send(:key, feature.name), retrieval_response)
+      end
+      let(:retrieval_response) { feature }
+
+      it { should eq retrieval_response }
+
+      it "should populate the upper cache" do
+        expect(caches[1]).not_to receive(:write)
+        expect(caches[0]).to receive(:write).once
+        subject
+      end
+
+      it 'should not have performed a retrieval' do
+        expect{|b| described_instance.call(feature.name, &b)}.not_to yield_control
+        subject
+      end
+    end
+  end
+
+  describe "with one cache" do
+    let(:caches) { ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute) }
+    it_behaves_like "a cache"
+  end
+
+
 end
