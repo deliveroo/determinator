@@ -1,3 +1,8 @@
+# v2.1.0 (2019-05-01)
+
+Feature:
+- Adds HttpRetriever and cascading cache support (#58)
+
 # v2.0.0 (2019-02-19)
 
 Breaking change:
