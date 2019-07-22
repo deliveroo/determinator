@@ -1,5 +1,6 @@
 require 'digest/md5'
 require 'determinator/actor_control'
+require 'semantic'
 
 module Determinator
   class Control
@@ -115,10 +116,39 @@ module Determinator
 
         tg.constraints.reduce(true) do |fit, (scope, *required)|
           present = [*normalised_properties[scope]]
-          fit && (required.flatten & present.flatten).any?
+          fit && matches_requirements?(scope, required, present)
         end
-      # Must choose target group deterministically, if more than one match
+        # Must choose target group deterministically, if more than one match
       }.sort_by { |tg| tg.rollout }.last
+    end
+
+    def matches_requirements?(scope, required, present)
+      case scope
+        when "app_version" then has_any_app_version?(required, present)
+        else has_any?(required, present)
+      end
+    end
+
+    def has_any?(required, present)
+      (required.flatten & present.flatten).any?
+    end
+
+    def has_any_app_version?(required, present)
+      invalid_properties = present.flatten.select do |v|
+        !v.match?(Semantic::Version::SemVerRegexp)
+      end
+      invalid_groups = required.flatten.select do |v|
+        !v.match?(/\d/)
+      end
+
+      return false if (invalid_properties + invalid_groups).any?
+
+      present.flatten.any? do |g|
+        given_version = Semantic::Version.new(g)
+        required.flatten.all? do |n|
+          given_version.satisfies?(n)
+        end
+      end
     end
 
     def actor_identifier(feature, id, guid)
