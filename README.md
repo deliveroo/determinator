@@ -194,6 +194,20 @@ determinator.which_variant(:my_experiment_name)
 
 Check the example Rails app in the `examples` directory for more information on how to make use of this gem.
 
+### app_version constraint
+
+Feature flags and experiments can also be limited to actors with a [semantic versioning](https://semver.org/) property using an `app_version` property:
+```ruby
+variant = determinator.which_variant(
+  :my_experiment_name,
+  properties: {
+    app_version: "1.2.3"
+  }
+)
+``` 
+The `app_version` constraint for that flag needs to follow ruby gem version constraints. We support the following operators: `>, <, >=, <=, ~>`. For example:
+`app_version: ">=1.2.0"`
+
 ### Using Determinator in RSpec
 
 * Include the  `spec_helper.rb`.
