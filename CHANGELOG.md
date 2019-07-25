@@ -1,4 +1,4 @@
-# HEAD
+# v2.1.0 (2019-07-25)
 
 Feature:
 - Adds support for `app_version` constraints (#60)
