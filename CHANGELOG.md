@@ -1,4 +1,9 @@
-# v2.1.0 (2019-07-25)
+# v2.2.1 (2019-07-29)
+
+Bug fix:
+- Ensures the dependency to semantic is included at runtime
+
+# v2.2.0 (2019-07-25)
 
 Feature:
 - Adds support for `app_version` constraints (#60)
