@@ -1,6 +1,7 @@
 require 'digest/md5'
 require 'determinator/actor_control'
 require 'semantic'
+require 'securerandom'
 
 module Determinator
   class Control
