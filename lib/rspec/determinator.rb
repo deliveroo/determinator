@@ -7,6 +7,7 @@ module RSpec
       by.extend(DSL)
 
       by.let(:fake_retriever) { ::Determinator::Retrieve::InMemoryRetriever.new }
+      by.let(:fake_determinator) { ::RSpec::Determinator::FakeDeterminator.new(fake_retriever) }
       by.around do |example|
         old_retriever = ::Determinator.instance.retrieval
         begin
@@ -34,29 +35,40 @@ module RSpec
           outcome = send(outcome) if outcome.is_a?(Symbol)
           only_for = send(only_for) if only_for.is_a?(Symbol)
 
-          active = !!outcome
-          variants = case outcome
-                     when true, false then
-                       []
-                     else
-                       { outcome => 1 }
-                     end
-          target_group = ::Determinator::TargetGroup.new(
-            rollout: 65_536,
-            constraints: Hash[only_for.map { |key, value| [key.to_s, value] }]
-          )
-
-          feature = ::Determinator::Feature.new(
-            name: name.to_s,
-            identifier: name.to_s,
-            bucket_type: 'single',
-            active: active,
-            variants: variants,
-            target_groups: [target_group]
-          )
-
-          fake_retriever.store(feature)
+          ::RSpec::Determinator::FakeDeterminator.new(fake_retriever).mock_result(name, outcome, only_for: only_for)
         end
+      end
+
+    end
+
+    class FakeDeterminator
+      def initialize(in_memory_retriever)
+        @retriever = in_memory_retriever
+      end
+
+      def mock_result(name, outcome, only_for: {})
+        active = !!outcome
+        variants = case outcome
+                   when true, false then
+                     []
+                   else
+                     { outcome => 1 }
+                   end
+        target_group = ::Determinator::TargetGroup.new(
+          rollout: 65_536,
+          constraints: Hash[only_for.map { |key, value| [key.to_s, value] }]
+        )
+
+        feature = ::Determinator::Feature.new(
+          name: name.to_s,
+          identifier: name.to_s,
+          bucket_type: 'single',
+          active: active,
+          variants: variants,
+          target_groups: [target_group]
+        )
+
+        @retriever.store(feature)
       end
     end
   end
