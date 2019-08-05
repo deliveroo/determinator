@@ -10,6 +10,7 @@ module RSpec
       by.around do |example|
         old_retriever = ::Determinator.instance.retrieval
         begin
+          fake_retriever.clear!
           ::Determinator.configure(retrieval: fake_retriever)
           example.run
         ensure

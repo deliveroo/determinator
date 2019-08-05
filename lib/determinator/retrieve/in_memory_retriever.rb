@@ -17,6 +17,10 @@ module Determinator
       def store(feature)
         @features[feature.name] = feature
       end
+
+      def clear!
+        @features.clear
+      end
     end
 
   end
