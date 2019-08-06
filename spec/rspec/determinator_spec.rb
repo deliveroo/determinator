@@ -35,6 +35,13 @@ describe RSpec::Determinator, :determinator_support do
       it { should eq 'outcome' }
     end
 
+    context 'when forcing a determination for actors with specific numeric properties' do
+      forced_determination(:my_experiment, 'outcome', only_for: { 1 => 2 })
+      let(:properties) { { 1 => 2 } }
+
+      it { should eq 'outcome' }
+    end
+
     context 'when forcing a determination for actors with specific properties that match when the forced determination needs to be normalized' do
       forced_determination(:my_experiment, 'outcome', only_for: { 'property' => 'correct' })
       let(:properties) { { property: 'correct' } }

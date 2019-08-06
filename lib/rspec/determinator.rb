@@ -56,7 +56,7 @@ module RSpec
                    end
         target_group = ::Determinator::TargetGroup.new(
           rollout: 65_536,
-          constraints: Hash[only_for.map { |key, value| [key.to_s, value] }]
+          constraints: only_for.map { |key, value| [key.to_s, value.to_s] }.to_h
         )
 
         feature = ::Determinator::Feature.new(
