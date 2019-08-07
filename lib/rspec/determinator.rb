@@ -27,15 +27,20 @@ module RSpec
       # If `outcome` or `only_for` are Symbols then the example-scoped variable of that name will be referenced (ie. those
       # variables created by `let` declarations)
       #
-      # @params name [#to_s] The name of the Feature Flag or Experiment to mock
-      # @params outcome [Boolean,String,Symbol] The outcome which should be supplied. Will look up an example variable if a Symbol is given.
-      # @params :only_for [Hash,Symbol] The constraints that must be matched exactly in order for the determination to be applied.
-      def forced_determination(name, outcome, only_for: {})
+      # @param [String,Symbol] name The name of the Feature Flag or Experiment to mock
+      # @param [Boolean,String,Symbol] outcome The outcome which should be supplied. Will look up an example variable if a Symbol is given.
+      # @param [Hash,Symbol] :only_for The constraints that must be matched exactly in order for the determination to be applied.
+      def forced_determination(name, outcome, bucket_type: 'single', only_for: {})
         before do
           outcome = send(outcome) if outcome.is_a?(Symbol)
           only_for = send(only_for) if only_for.is_a?(Symbol)
 
-          ::RSpec::Determinator::FakeDeterminator.new(fake_retriever).mock_result(name, outcome, only_for: only_for)
+          ::RSpec::Determinator::FakeDeterminator.new(fake_retriever).mock_result(
+            name,
+            outcome,
+            bucket_type: bucket_type,
+            only_for: only_for
+          )
         end
       end
 
@@ -46,7 +51,13 @@ module RSpec
         @retriever = in_memory_retriever
       end
 
-      def mock_result(name, outcome, only_for: {})
+      VALID_BUCKET_TYPES = %w{ id guid single }.freeze
+
+      def mock_result(name, outcome, bucket_type: 'single', only_for: {})
+        if !VALID_BUCKET_TYPES.include?(bucket_type)
+          raise ArgumentError.new("bad bucket type #{bucket_type}, expected one of: #{VALID_BUCKET_TYPES.join(' ')}")
+        end
+
         active = !!outcome
         variants = case outcome
                    when true, false then
@@ -62,7 +73,7 @@ module RSpec
         feature = ::Determinator::Feature.new(
           name: name.to_s,
           identifier: name.to_s,
-          bucket_type: 'single',
+          bucket_type: bucket_type,
           active: active,
           variants: variants,
           target_groups: [target_group]
