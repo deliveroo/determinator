@@ -95,6 +95,13 @@ describe RSpec::Determinator, :determinator_support do
       it { should eq 'outcome' }
     end
 
+    context 'when forcing a determination for array constraints' do
+      forced_determination(:my_experiment, 'outcome', only_for: { attribute: %w(thing-a thing-b) })
+      let(:properties) { { attribute: 'thing-b' } }
+
+      it { should eq 'outcome' }
+    end
+
     context 'when using an ActorControl proxy' do
       let(:determinator) { Determinator.instance.for_actor(id: 123) }
       subject(:determination) { determinator.which_variant(:my_experiment, properties: properties) }
