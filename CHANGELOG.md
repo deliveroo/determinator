@@ -1,52 +1,7 @@
-# v??? (2019-08-20)
-
-⚠️ This release includes breaking changes to `RSpec::Determinator` ⚠️
-
-`RSpec::Determinator` now uses the same determination implementation as normal
-determination calls. `RSpec::Determinator` previously used its own
-determination implementation that allowed stacking multiple
-`forced_determination` calls like so:
-
-```ruby
-forced_determination('my-feature-flag', true, only_for: { 'good-actor': true })
-forced_determination('my-feature-flag', false, only_for: { 'bad-actor': true })
-
-context 'good actors' do
-  subject { Determinator.instance.feature_flag_on?(properties: { 'good-actor': true }) }
-  it { is_expected.to be true }
-end
-
-context 'bad actors' do
-  subject { Determinator.instance.feature_flag_on?(properties: { 'bad-actor': true }) }
-  it { is_expected.to be false }
-end
-```
-
-Determinator features don't _quite_ work this way - you can't specify
-constraints that force a negative determinator result (or a particular
-variant). In `RSpec::Determinator` as of this version, the second
-`forced_determination` call will override the `my-feature-flag` feature from
-the first call, and everything will be 
-
-For the above example, you would have to trust determinator's default-to-false
-property rather than explicitly setting it:
-
-```ruby
-forced_determination('my-feature-flag', true, only_for: { 'good-actor': true })
-
-context 'good actors' do
-  subject { Determinator.instance.feature_flag_on?(properties: { 'good-actor': true }) }
-  it { is_expected.to be true }
-end
-
-context 'everyone else' do
-  subject { Determinator.instance.feature_flag_on? }
-  it { is_expected.to be false }
-end
-```
+# Next version
 
 Feature:
-- `RSpec::Determinator` can apply `app_version` constraints
+- `RSpec::Determinator` can apply `app_version` constraints but no longer supports multiple `forced_determination` calls on the same feature. [See the PR for an in-depth write-up.](https://github.com/deliveroo/determinator/pull/63)
 
 # v2.2.1 (2019-07-29)
 
