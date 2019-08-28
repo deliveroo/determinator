@@ -1,3 +1,8 @@
+# Next version
+
+Feature:
+- `RSpec::Determinator` can apply `app_version` constraints but no longer supports multiple `forced_determination` calls on the same feature. [See the PR for an in-depth write-up.](https://github.com/deliveroo/determinator/pull/63)
+
 # v2.2.1 (2019-07-29)
 
 Bug fix:

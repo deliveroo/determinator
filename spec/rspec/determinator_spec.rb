@@ -8,7 +8,9 @@ describe RSpec::Determinator, :determinator_support do
   subject(:determinator) { Determinator.instance }
 
   describe 'the determination for the experiment' do
-    subject(:determination) { determinator.which_variant(:my_experiment, properties: properties) }
+    subject(:determination) { determinator.which_variant(:my_experiment, id: id, guid: guid, properties: properties) }
+    let(:id) { nil }
+    let(:guid) { nil }
     let(:properties) { {} }
 
     context 'when not forcing a determination' do
@@ -31,6 +33,13 @@ describe RSpec::Determinator, :determinator_support do
     context 'when forcing a determination for actors with specific properties that match' do
       forced_determination(:my_experiment, 'outcome', only_for: { property: 'correct' })
       let(:properties) { { property: 'correct' } }
+
+      it { should eq 'outcome' }
+    end
+
+    context 'when forcing a determination for actors with specific numeric properties' do
+      forced_determination(:my_experiment, 'outcome', only_for: { 1 => 2 })
+      let(:properties) { { 1 => 2 } }
 
       it { should eq 'outcome' }
     end
@@ -79,8 +88,23 @@ describe RSpec::Determinator, :determinator_support do
       it { should eq 'second outcome' }
     end
 
+    context 'when forcing a determination for array constraints' do
+      forced_determination(:my_experiment, 'outcome', only_for: { attribute: %w(thing-a thing-b) })
+      let(:properties) { { attribute: 'thing-b' } }
+
+      it { should eq 'outcome' }
+    end
+
+    context 'when forcing a determination for array constraints' do
+      forced_determination(:my_experiment, 'outcome', only_for: { attribute: %w(thing-a thing-b) })
+      let(:properties) { { attribute: 'thing-b' } }
+
+      it { should eq 'outcome' }
+    end
+
     context 'when using an ActorControl proxy' do
       let(:determinator) { Determinator.instance.for_actor(id: 123) }
+      subject(:determination) { determinator.which_variant(:my_experiment, properties: properties) }
 
       context 'when not forcing a determination' do
         it { should eq false }
