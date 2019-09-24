@@ -30,7 +30,7 @@ shared_examples 'retrieve tests' do
         expect(Determinator).to have_received(:notice_error).with(error)
       end
 
-      it { is_expected.to be false }
+      it { is_expected.to be_a ErrorResponse }
     end
   end
 
@@ -41,6 +41,6 @@ shared_examples 'retrieve tests' do
       retrieve
     end
 
-    it { is_expected.to be nil }
+    it { is_expected.to be_a MissingResponse }
   end
 end

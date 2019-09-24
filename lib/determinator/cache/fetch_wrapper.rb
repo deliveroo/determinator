@@ -13,11 +13,15 @@ module Determinator
       # any cache, otherwise popularing each cache with the value of yield.
       def call(feature_name)
         value = read_and_upfill(feature_name)
-        # nil is an acceptable value in the case of a missing feature definition
-        return nil if value.nil? && @cache_missing
-        return value if value != false && !value.nil?
+
+        # if the value is missing and we cache it, return the missing response
+        return value if value.is_a?(MissingResponse) && @cache_missing
+
+        #otherwise only return the non nil/notice_missing_feature value
+        return value if !value.nil? && !(value.is_a?(MissingResponse) && !@cache_missing)
 
         value_to_write = yield
+        return value_to_write if value.is_a?(ErrorResponse)
         @caches.each do |cache|
           cache.write(key(feature_name), value_to_write)
         end
@@ -40,8 +44,7 @@ module Determinator
       # in that list will be backfilled.
       #
       # @param url [String] a feature name
-      # @return [false, nil, Feature] false when no value is found, otherwise
-      # the value stored in the cache (including nil)
+      # @return [Feature, MissingResponse] nil when no value is found, otherwise
       def read_and_upfill(feature_name)
         @caches.each.with_index do |cache, index|
           if cache.exist?(key(feature_name))
@@ -52,7 +55,7 @@ module Determinator
             return value
           end
         end
-        return false
+        return nil
       end
     end
   end

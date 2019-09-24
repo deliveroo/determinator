@@ -12,10 +12,10 @@ module Determinator
       def retrieve(name)
         response = @connection.get("/features/#{name}")
         return Determinator::Serializers::JSON.load(response.body) if response.status == 200
-        return nil if response.status == 404
+        return MissingResponse.new if response.status == 404
       rescue => e
         Determinator.notice_error(e)
-        false
+        ErrorResponse.new
       end
 
       # Returns a feature name given a actor-tracking url. Used so we are able

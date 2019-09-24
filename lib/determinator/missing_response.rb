@@ -1,0 +1,1 @@
+class MissingResponse; end
