@@ -53,6 +53,14 @@ RSpec.describe Determinator::Cache::FetchWrapper do
         it 'should not have performed a retrieval' do
           expect{|b| described_instance.call(feature.name, &b)}.not_to yield_control
         end
+
+        context 'and cached nils are off' do
+          let(:described_instance) { described_class.new(*caches, cache_missing: false) }
+          it { should eq retrieval_response }
+          it 'should have performed a retrieval' do
+            expect{|b| described_instance.call(feature.name, &b)}.to yield_control
+          end
+        end
       end
     end
   end
@@ -91,6 +99,4 @@ RSpec.describe Determinator::Cache::FetchWrapper do
     let(:caches) { ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute) }
     it_behaves_like "a cache"
   end
-
-
 end

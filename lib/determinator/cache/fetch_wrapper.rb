@@ -4,7 +4,8 @@ module Determinator
       # @param *caches [ActiveSupport::Cache] If a list then the head of the the
       # list should will be checked before the  tail. If the head is empty but
       # the tail is not then the head will be filled with the value of the tail.
-      def initialize(*caches)
+      def initialize(*caches, cache_missing: true)
+        @cache_missing = cache_missing
         @caches = caches
       end
 
@@ -13,8 +14,8 @@ module Determinator
       def call(feature_name)
         value = read_and_upfill(feature_name)
         # nil is an acceptable value in the case of a missing feature definition
-        return nil if value.nil?
-        return value if value != false
+        return nil if value.nil? && @cache_missing
+        return value if value != false && !value.nil?
 
         value_to_write = yield
         @caches.each do |cache|
