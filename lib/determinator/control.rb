@@ -62,9 +62,9 @@ module Determinator
     def determinate_and_notice(name, id:, guid:, properties:)
       feature = Determinator.with_retrieval_cache(name) { retrieval.retrieve(name) }
 
-      if feature.is_a?(ErrorResponse) || feature.is_a?(MissingResponse)
+      if feature.nil? || feature.is_a?(ErrorResponse) || feature.is_a?(MissingResponse)
         Determinator.notice_missing_feature(name)
-        return nil
+        return false
       end
 
       determinate(feature, id: id, guid: guid, properties: properties).tap do |determination|

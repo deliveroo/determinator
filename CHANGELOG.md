@@ -1,3 +1,11 @@
+# Master
+
+Feature:
+- Add a flag `cache_missing[true]` to the cache wrapper to control the cache behaviour on 404
+
+Bug fix:
+- Ensure errors are not cached by the cache wrapper
+
 # v2.3.0 (2019-09-06)
 
 Feature:
