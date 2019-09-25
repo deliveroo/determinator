@@ -32,6 +32,17 @@ RSpec.describe Determinator::Cache::FetchWrapper do
       end
     end
 
+    context "if there is an error response" do
+      let(:retrieval_response) { Determinator::ErrorResponse.new }
+
+      it "should populate any caches" do
+        [caches].flatten.each do |cache|
+          expect(cache).not_to receive(:write)
+        end
+        subject
+      end
+    end
+
     context 'when the feature does not exist' do
       let(:retrieval_response) { Determinator::MissingResponse.new }
 

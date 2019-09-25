@@ -21,7 +21,7 @@ module Determinator
         return value if !value.nil? && !(value.is_a?(MissingResponse) && !@cache_missing)
 
         value_to_write = yield
-        return value_to_write if value.is_a?(ErrorResponse)
+        return value_to_write if value_to_write.is_a?(ErrorResponse)
         @caches.each do |cache|
           cache.write(key(feature_name), value_to_write)
         end
