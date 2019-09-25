@@ -33,12 +33,12 @@ RSpec.describe Determinator::Cache::FetchWrapper do
     end
 
     context 'when the feature does not exist' do
-      let(:retrieval_response) { MissingResponse.new }
+      let(:retrieval_response) { Determinator::MissingResponse.new }
 
       context 'when the (absence of the) feature is not in the cache' do
         # No setup required
 
-        it { should be_a MissingResponse }
+        it { should be_a Determinator::MissingResponse }
         it 'should have performed a retrieval' do
           expect{|b| described_instance.call(feature.name, &b)}.to yield_control
         end
@@ -49,7 +49,7 @@ RSpec.describe Determinator::Cache::FetchWrapper do
           described_instance.call(feature.name) { retrieval_response }
         end
 
-        it { should be_a MissingResponse }
+        it { should be_a Determinator::MissingResponse }
         it 'should not have performed a retrieval' do
           expect{|b| described_instance.call(feature.name, &b)}.not_to yield_control
         end

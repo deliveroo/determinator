@@ -1,1 +1,3 @@
-class ErrorResponse; end
+module Determinator
+  class ErrorResponse; end
+end

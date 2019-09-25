@@ -44,7 +44,7 @@ module Determinator
       # in that list will be backfilled.
       #
       # @param url [String] a feature name
-      # @return [Feature, MissingResponse] nil when no value is found, otherwise
+      # @return [Feature, MissingResponse] nil when no value is found
       def read_and_upfill(feature_name)
         @caches.each.with_index do |cache, index|
           if cache.exist?(key(feature_name))
