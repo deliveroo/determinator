@@ -13,11 +13,11 @@ module Determinator
 
       def retrieve(feature_id)
         feature = @root.join(feature_id.to_s)
-        return unless feature.exist?
+        return MissingResponse.new unless feature.exist?
         @serializer.load(feature.read)
       rescue => e
         Determinator.notice_error(e)
-        nil
+        ErrorResponse.new
       end
     end
   end

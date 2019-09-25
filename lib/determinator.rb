@@ -4,6 +4,9 @@ require 'determinator/feature'
 require 'determinator/target_group'
 require 'determinator/cache/fetch_wrapper'
 require 'determinator/serializers/json'
+require 'determinator/missing_response'
+require 'determinator/error_response'
+
 
 module Determinator
   class << self

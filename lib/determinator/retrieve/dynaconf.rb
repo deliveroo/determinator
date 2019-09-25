@@ -17,10 +17,11 @@ module Determinator
 
       def retrieve(feature_id)
         response = get(feature_id)
-        Determinator::Serializers::JSON.load(response.body) if response.status == 200
+        return Determinator::Serializers::JSON.load(response.body) if response.status == 200
+        return MissingResponse.new if response.status == 404
       rescue => e
         Determinator.notice_error(e)
-        nil
+        ErrorResponse.new
       end
 
       private
