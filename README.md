@@ -220,7 +220,7 @@ Determinator.configure(retrieval: nil)
 
 * Tag your rspec test with `:determinator_support`, so the `forced_determination` helper method will be available.
 
-  Please note, `RSpec::Determinator` mocks a determination _outcome_, not the process of choosing an outcome. Set the `only_for` argument to be the required properties for Determinator to return the specified outcome.
+  Please note, `RSpec::Determinator` mocks a determination _outcome_, not the process of choosing one. Set the `only_for` argument to be the properties you require for Determinator to return the specified outcome. At the moment this mock does not allow for the testing of the `id` or `guid` arguments (only the properties).
 
 ```ruby
 RSpec.describe "something", :determinator_support do
