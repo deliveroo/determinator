@@ -30,16 +30,21 @@ module RSpec
       # @param [String,Symbol] name The name of the Feature Flag or Experiment to mock
       # @param [Boolean,String,Symbol] outcome The outcome which should be supplied. Will look up an example variable if a Symbol is given.
       # @param [Hash,Symbol] :only_for The constraints that must be matched exactly in order for the determination to be applied.
-      def forced_determination(name, outcome, bucket_type: 'single', only_for: {})
+      # @param [String,Symbol] :winning_variant The winning variant. Will look up an example variable if a Symbol is given.
+      # @param [Hash] :overrides
+      def forced_determination(name, outcome, bucket_type: 'single', only_for: {}, winning_variant: nil, overrides: {})
         before do
           outcome = send(outcome) if outcome.is_a?(Symbol)
           only_for = send(only_for) if only_for.is_a?(Symbol)
+          winning_variant = send(winning_variant) if winning_variant.is_a?(Symbol)
 
           ::RSpec::Determinator::FakeDeterminator.new(fake_retriever).mock_result(
             name,
             outcome,
             bucket_type: bucket_type,
-            only_for: only_for
+            only_for: only_for,
+            winning_variant: winning_variant,
+            overrides: overrides,
           )
         end
       end
@@ -47,13 +52,19 @@ module RSpec
     end
 
     class FakeDeterminator
+
       def initialize(in_memory_retriever)
         @retriever = in_memory_retriever
       end
 
       VALID_BUCKET_TYPES = %w{ id guid single }.freeze
 
-      def mock_result(name, outcome, bucket_type: 'single', only_for: {})
+      # @param [String,Symbol] name The name of the experiment or feature flag
+      # @param [Boolean,String] outcome
+      # @param [String,nil] winning_variant
+      # @param [Hash] overrides
+      # @return [Determinator::Feature]
+      def mock_result(name, outcome, bucket_type: 'single', only_for: {}, winning_variant: nil, overrides: {})
         if !VALID_BUCKET_TYPES.include?(bucket_type)
           raise ArgumentError.new("bad bucket type #{bucket_type}, expected one of: #{VALID_BUCKET_TYPES.join(' ')}")
         end
@@ -76,10 +87,14 @@ module RSpec
           bucket_type: bucket_type,
           active: active,
           variants: variants,
-          target_groups: [target_group]
+          target_groups: [target_group],
+          winning_variant: winning_variant,
+          overrides: overrides,
         )
 
         @retriever.store(feature)
+
+        feature
       end
     end
   end
