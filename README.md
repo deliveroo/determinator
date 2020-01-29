@@ -204,7 +204,7 @@ variant = determinator.which_variant(
     app_version: "1.2.3"
   }
 )
-``` 
+```
 The `app_version` constraint for that flag needs to follow ruby gem version constraints. We support the following operators: `>, <, >=, <=, ~>`. For example:
 `app_version: ">=1.2.0"`
 
@@ -250,6 +250,35 @@ end
 ```
 
 * Check out [the specs for `RSpec::Determinator`](spec/rspec/determinator_spec.rb) to find out what you can do!
+
+## Tracking
+
+The library includes a middleware to track all determinations being made, allowing logging them at the end of the request
+(including some useful request metrics).
+
+To enable it, e.g. in Rails:
+
+```ruby
+# config/application.rb
+
+require 'determinator/tracking/rack/middleware'
+
+# possibly near the top of your stack, in case other middlewares make determinations
+config.middleware.use Determinator::Tracking::Rack::Middleware
+```
+
+```ruby
+# config/initializers/determinator.rb
+
+require 'determinator/tracking'
+
+Determinator::Tracking.on_request do |r|
+  Rails.logger.info("Request time: #{r.time}, error: #{r.error?}, status: #{r.attributes[:status]}")
+  request.determinations.each do |d|
+    Rails.logger.info("Determination id: #{d.id}, guid: #{d.guid}, flag: #{d.feature_id}, result: #{d.determination}")
+  end
+end
+```
 
 ## Testing this library
 
