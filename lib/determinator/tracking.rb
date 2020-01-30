@@ -2,7 +2,7 @@ require 'determinator/tracking/tracker'
 
 module Determinator
   module Tracking
-    class <<self
+    class << self
       def instance
         Thread.current[:determinator_tracker]
       end

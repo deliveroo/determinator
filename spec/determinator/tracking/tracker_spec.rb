@@ -10,7 +10,7 @@ describe Determinator::Tracking::Tracker do
     let(:perform) { subject.track(123, 'abc', feature, 'A') }
 
     it 'enqueues a determination' do
-      expect{ perform }.to change{ subject.determinations.length }.by(1)
+      expect { perform }.to change { subject.determinations.length }.by(1)
     end
 
     it 'sets the correct parameters' do
