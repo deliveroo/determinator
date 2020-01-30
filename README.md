@@ -274,7 +274,7 @@ require 'determinator/tracking'
 
 Determinator::Tracking.on_request do |r|
   Rails.logger.info("Request time: #{r.time}, error: #{r.error?}, status: #{r.attributes[:status]}")
-  request.determinations.each do |d|
+  r.determinations.each do |d|
     Rails.logger.info("Determination id: #{d.id}, guid: #{d.guid}, flag: #{d.feature_id}, result: #{d.determination}")
   end
 end
