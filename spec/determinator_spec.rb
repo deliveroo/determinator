@@ -22,12 +22,12 @@ describe Determinator do
   end
 
   describe '::on_determination and ::notice_determination' do
-    it 'sets the determination callback' do
-      id = 'id'
-      guid = 'guid'
-      feature = FactoryGirl.create(:feature)
-      determination = 'variant'
+    let(:id) { 'id' }
+    let(:guid) { 'guid' }
+    let(:determination) { 'variant' }
+    let(:feature) { FactoryGirl.create(:feature) }
 
+    it 'sets the determination callback' do
       determiantion_notified = false
 
       described_class.on_determination do |i, g, f, d|
@@ -38,6 +38,11 @@ describe Determinator do
 
       described_class.notice_determination(id, guid, feature, determination)
       expect(determiantion_notified).to be true
+    end
+
+    it 'notice_determination calls the tracker' do
+      expect(Determinator::Tracking).to receive(:track)
+      described_class.notice_determination(id, guid, feature, determination)
     end
   end
 end
