@@ -278,6 +278,18 @@ Determinator::Tracking.on_request do |r|
     Rails.logger.info("Determination id: #{d.id}, guid: #{d.guid}, flag: #{d.feature_id}, result: #{d.determination}")
   end
 end
+
+# If using an APM, you can provide trace information on the request by providing a get_context hook: e.g.
+
+Determinator::Tracking.get_context do
+  span = Datadog.tracer.active_root_span
+  return unless span
+  Determinator::Tracking::Context.new(
+    request_id: span.trace_id,
+    service: span.service,
+    resource: span.resource
+  )
+end
 ```
 
 ## Testing this library

@@ -21,7 +21,7 @@ describe Determinator::Tracking::Rack::Middleware do
 
       after do
         $_test_request = nil
-        Determinator::Tracking.clear_on_request!
+        Determinator::Tracking.clear_hooks!
       end
 
       it 'reports a request' do

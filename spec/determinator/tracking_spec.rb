@@ -72,13 +72,29 @@ describe Determinator::Tracking do
         end
 
         after do
-          described_class.clear_on_request!
+          described_class.clear_hooks!
         end
 
         it 'calls the reporter' do
           expect{ described_class.finish!(error: false, foo: :bar) }.to change{ $_test_request }
             .from(nil)
             .to(instance_of(Determinator::Tracking::Request))
+        end
+      end
+
+      context 'when context is enabled' do
+        before do
+          described_class.get_context do
+            Determinator::Tracking::Context.new(request_id: 'abc')
+          end
+        end
+
+        after do
+          described_class.clear_hooks!
+        end
+
+        it 'sets the context' do
+          expect(described_class.finish!(error: false, foo: :bar).context.request_id).to eq('abc')
         end
       end
     end

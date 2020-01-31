@@ -1,4 +1,5 @@
 require 'determinator/tracking/tracker'
+require 'determinator/tracking/context'
 
 module Determinator
   module Tracking
@@ -36,13 +37,25 @@ module Determinator
         @on_request = block
       end
 
-      def clear_on_request!
-        @on_request
-      end
-
       def report(request)
         return unless @on_request
         @on_request.call(request)
+      end
+
+      def get_context(&block)
+        @get_context = block
+      end
+
+      def context
+        return unless @get_context
+        @get_context.call
+      rescue
+        nil
+      end
+
+      def clear_hooks!
+        @on_request = nil
+        @get_context = nil
       end
     end
   end

@@ -28,7 +28,8 @@ module Determinator
           time: request_time,
           error: error,
           attributes: attributes,
-          determinations: determinations
+          determinations: determinations,
+          context: Determinator::Tracking.context
         )
       end
     end
