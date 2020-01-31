@@ -287,7 +287,9 @@ Determinator::Tracking.get_context do
   Determinator::Tracking::Context.new(
     request_id: span.trace_id,
     service: span.service,
-    resource: span.resource
+    resource: span.resource,
+    type: span.type,
+    meta: span.meta
   )
 end
 ```
