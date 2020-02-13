@@ -294,6 +294,13 @@ Determinator::Tracking.get_context do
 end
 ```
 
+NOTE: this is implemented by keeping the list of requests in a per-request thread-local variable, which means that determinations will only be tracked on the main thread.
+
+If your application is spinning out worker threads, you should make the determinations in the main thread if possible; or collect them from your worker threads and track them in the main thread with
+```
+Determinator::Tracking.track(id, guid, feature, determination)
+```
+
 ## Testing this library
 
 This library makes use of the [Determinator Standard Tests](https://github.com/deliveroo/determinator-standard-tests) to ensure that it conforms to the same specification as determinator libraries in other languages. The standard tests can be updated to the latest ones available by updating the submodule:
