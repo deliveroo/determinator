@@ -9,7 +9,7 @@ module Determinator
       def initialize(type)
         @determinations = []
         @type = type
-        @start = Time.now
+        @start = now
       end
 
       def track(id, guid, feature, determination)
@@ -22,7 +22,7 @@ module Determinator
       end
 
       def finish!(error:, **attributes)
-        request_time = Time.now - @start
+        request_time = now - @start
         Determinator::Tracking::Request.new(
           type: type,
           time: request_time,
@@ -31,6 +31,12 @@ module Determinator
           determinations: determinations,
           context: Determinator::Tracking.context
         )
+      end
+
+      private
+
+      def now
+        Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
     end
   end
