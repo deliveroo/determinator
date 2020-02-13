@@ -273,9 +273,9 @@ config.middleware.use Determinator::Tracking::Rack::Middleware
 require 'determinator/tracking'
 
 Determinator::Tracking.on_request do |r|
-  Rails.logger.info("Request time: #{r.time}, error: #{r.error?}, status: #{r.attributes[:status]}")
+  Rails.logger.info("tag=determinator_request request_time=#{r.time} error=#{r.error?} status=#{r.attributes[:status]}")
   r.determinations.each do |d|
-    Rails.logger.info("Determination id: #{d.id}, guid: #{d.guid}, flag: #{d.feature_id}, result: #{d.determination}")
+    Rails.logger.info("tag=determination id=#{d.id} guid=#{d.guid} flag=#{d.feature_id} result=#{d.determination}")
   end
 end
 
