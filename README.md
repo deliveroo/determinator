@@ -267,13 +267,27 @@ require 'determinator/tracking/rack/middleware'
 config.middleware.use Determinator::Tracking::Rack::Middleware
 ```
 
+or for Sidekiq:
+
+```ruby
+# config/initializers/sidekiq.rb
+
+require 'determinator/tracking/sidekiq/middleware'
+
+Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add Determinator::Tracking::Sidekiq::Middleware
+  end
+end
+```
+
 ```ruby
 # config/initializers/determinator.rb
 
 require 'determinator/tracking'
 
 Determinator::Tracking.on_request do |r|
-  Rails.logger.info("tag=determinator_request request_time=#{r.time} error=#{r.error?} status=#{r.attributes[:status]}")
+  Rails.logger.info("tag=determinator_request type=#{r.type} request_time=#{r.time} error=#{r.error?} response_status=#{r.attributes[:status]} sidekiq_queue=#{r.attributes[:queue]}")
   r.determinations.each do |d|
     Rails.logger.info("tag=determination id=#{d.id} guid=#{d.guid} flag=#{d.feature_id} result=#{d.determination}")
   end
