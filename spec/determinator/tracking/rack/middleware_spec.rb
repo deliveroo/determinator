@@ -15,42 +15,44 @@ describe Determinator::Tracking::Rack::Middleware do
     end
     context 'when reporting is enabled' do
       before do
-        $_test_request = nil
-        Determinator::Tracking.on_request{ |r| $_test_request = r }
+        @test_request = nil
+        Determinator::Tracking.on_request { |r| @test_request = r }
       end
 
       after do
-        $_test_request = nil
+        @test_request = nil
         Determinator::Tracking.clear_hooks!
       end
 
       it 'reports a request' do
-        expect{ subject.call(env) }.to change{ $_test_request }
+        expect{ subject.call(env) }.to change{ @test_request }
           .from(nil).to instance_of(Determinator::Tracking::Request)
       end
 
       it 'sets the error to false' do
         subject.call(env)
-        expect($_test_request.error).to eq(false)
+        expect(@test_request.error).to eq(false)
       end
 
       it 'sets the status' do
         subject.call(env)
-        expect($_test_request.attributes[:status]).to eq(status)
+        expect(@test_request.attributes[:status]).to eq(status)
       end
 
       context 'when the request errors' do
+        let(:error) { StandardError.new }
+
         before do
-          allow(app).to receive(:call).and_raise
+          allow(app).to receive(:call).and_raise(error)
         end
 
         it 'sets the error to true' do
           subject.call(env) rescue nil
-          expect($_test_request.error).to eq(true)
+          expect(@test_request.error).to eq(true)
         end
 
         it 'raises the error' do
-          expect { subject.call(env) }.to raise_error
+          expect { subject.call(env) }.to raise_error(error)
         end
       end
     end
