@@ -1,3 +1,8 @@
+# Unreleased
+
+Feature:
+- Add tracker middleware
+
 # v2.3.1 (2019-05-25)
 
 Feature:

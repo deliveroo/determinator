@@ -6,6 +6,7 @@ require 'determinator/cache/fetch_wrapper'
 require 'determinator/serializers/json'
 require 'determinator/missing_response'
 require 'determinator/error_response'
+require 'determinator/tracking'
 
 
 module Determinator
@@ -83,6 +84,7 @@ module Determinator
     end
 
     def notice_determination(id, guid, feature, determination)
+      Determinator::Tracking.track(id, guid, feature, determination)
       return unless @determination_callback
       @determination_callback.call(id, guid, feature, determination)
     end

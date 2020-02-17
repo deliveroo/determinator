@@ -204,7 +204,7 @@ variant = determinator.which_variant(
     app_version: "1.2.3"
   }
 )
-``` 
+```
 The `app_version` constraint for that flag needs to follow ruby gem version constraints. We support the following operators: `>, <, >=, <=, ~>`. For example:
 `app_version: ">=1.2.0"`
 
@@ -252,6 +252,70 @@ end
 ```
 
 * Check out [the specs for `RSpec::Determinator`](spec/rspec/determinator_spec.rb) to find out what you can do!
+
+## Tracking
+
+The library includes a middleware to track all determinations being made, allowing logging them at the end of the request
+(including some useful request metrics).
+
+To enable it, e.g. in Rails:
+
+```ruby
+# config/application.rb
+
+require 'determinator/tracking/rack/middleware'
+
+# possibly near the top of your stack, in case other middlewares make determinations
+config.middleware.use Determinator::Tracking::Rack::Middleware
+```
+
+or for Sidekiq:
+
+```ruby
+# config/initializers/sidekiq.rb
+
+require 'determinator/tracking/sidekiq/middleware'
+
+Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add Determinator::Tracking::Sidekiq::Middleware
+  end
+end
+```
+
+```ruby
+# config/initializers/determinator.rb
+
+require 'determinator/tracking'
+
+Determinator::Tracking.on_request do |r|
+  Rails.logger.info("tag=determinator_request type=#{r.type} request_time=#{r.time} error=#{r.error?} response_status=#{r.attributes[:status]} sidekiq_queue=#{r.attributes[:queue]}")
+  r.determinations.each do |d|
+    Rails.logger.info("tag=determination id=#{d.id} guid=#{d.guid} flag=#{d.feature_id} result=#{d.determination}")
+  end
+end
+
+# If using an APM, you can provide trace information on the request by providing a get_context hook: e.g.
+
+Determinator::Tracking.get_context do
+  span = Datadog.tracer.active_root_span
+  return unless span
+  Determinator::Tracking::Context.new(
+    request_id: span.trace_id,
+    service: span.service,
+    resource: span.resource,
+    type: span.type,
+    meta: span.meta
+  )
+end
+```
+
+NOTE: this is implemented by keeping the list of requests in a per-request thread-local variable, which means that determinations will only be tracked on the main thread.
+
+If your application is spinning out worker threads, you should make the determinations in the main thread if possible; or collect them from your worker threads and track them in the main thread with
+```
+Determinator::Tracking.track(id, guid, feature, determination)
+```
 
 ## Testing this library
 
