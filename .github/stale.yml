@@ -1,0 +1,26 @@
+# PRs with these labels won't be marked as stale or closed
+exemptLabels:
+  - pinned
+
+# Ignore Github issues
+only: pulls
+
+# Number of days of inactivity before an issue becomes "stale"
+daysUntilStale: 7
+# A comment posted when this happens
+markComment: >
+  There's been no activity on this PR for a week, which seems unusual, so we've marked it as `stale`.
+  You're welcome to remove the label if you're still working on it.
+
+  If you're having difficulty please reach out to your team for help, or the
+  Developer Effectiveness team if Deliveroo's systems are getting in your way.
+staleLabel: stale
+
+# Number of days of inactivity before a stale issue is considered abandoned, and closed
+daysUntilClose: 7
+# A comment posted when this happens
+closeComment: >
+  There's been no activity on this `stale` PR for a week, which implies it's been abandoned.
+
+  We've closed it (so that it's clear you're not looking for assistance in getting your work
+  shipped) but if you're still working on it you're welcome to re-open it and continue.
