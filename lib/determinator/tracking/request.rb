@@ -3,7 +3,8 @@ module Determinator
     class Request
       attr_reader :type, :time, :error, :attributes, :determinations, :context
 
-      def initialize(type:, time:, error:, attributes:, determinations:, context: nil)
+      def initialize(start:, type:, time:, error:, attributes:, determinations:, context: nil)
+        @start = start
         @type = type
         @time = time
         @error = error

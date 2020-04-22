@@ -24,6 +24,7 @@ module Determinator
       def finish!(error:, **attributes)
         request_time = now - @start
         Determinator::Tracking::Request.new(
+          start: @start,
           type: type,
           time: request_time,
           error: error,
