@@ -25,6 +25,7 @@ describe Determinator::Tracking::Tracker do
     let(:perform) { subject.finish!(error: true, foo: :bar) }
 
     before do
+      allow(Process).to receive(:clock_gettime).and_return(1.0, 3.0)
       subject.track(123, 'abc', feature, 'A')
     end
 
@@ -32,8 +33,9 @@ describe Determinator::Tracking::Tracker do
       expect(perform).to be_a(Determinator::Tracking::Request)
     end
 
+    specify { expect(perform.start).to eq(1.0)}
     specify { expect(perform.type).to eq(:test) }
-    specify { expect(perform.time).to be_a(Float) }
+    specify { expect(perform.time).to eq(2.0) }
     specify { expect(perform.error).to eq(true) }
     specify { expect(perform.attributes).to eq({foo: :bar}) }
     specify { expect(perform.determinations.length).to eq(1) }
