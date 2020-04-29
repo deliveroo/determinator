@@ -10,6 +10,7 @@ module Determinator
       # The Control class will assume a nil return from this method
       # means the feature doesn't exist, so in turn will return `false`.
       def retrieve(_)
+        MissingResponse.new
       end
     end
   end
