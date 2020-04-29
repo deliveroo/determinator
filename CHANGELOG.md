@@ -1,3 +1,8 @@
+# 2.4.1
+
+Bug fix:
+- Update "fake" retrievers to match behaviour introduced in `v2.3.1` when a feature is missing
+
 # 2.4.0
 
 Feature:
