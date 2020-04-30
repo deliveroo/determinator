@@ -8,7 +8,7 @@ describe Determinator::Retrieve::NullRetriever do
 
   describe '#retrieve' do
     it 'should just return nil' do
-      expect(subject.retrieve(anything)).to be_nil
+      expect(subject.retrieve(anything)).to match an_instance_of(Determinator::MissingResponse)
     end
   end
 

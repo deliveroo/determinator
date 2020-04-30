@@ -10,7 +10,7 @@ module Determinator
 
       # @param name [string,symbol] The name of the feature to retrieve
       def retrieve(name)
-        @features[name.to_s]
+        @features.fetch(name.to_s, MissingResponse.new)
       end
 
       # @param feature [Determinator::Feature] The feature to store
