@@ -48,4 +48,13 @@ describe Determinator::Feature do
       it { should be_falsey }
     end
   end
+
+  describe 'when a fixed determination is present' do
+    let(:instance) { FactoryGirl.create(:experiment, fixed_determinations: [fixed_determination]) }
+    let(:fixed_determination) { {'active' => true, 'variant' => 'c', 'constraints' => {}} }
+
+    it 'should be ignored if the variant is not present in variants' do
+      expect(instance.fixed_determinations).to be_empty
+    end
+  end
 end

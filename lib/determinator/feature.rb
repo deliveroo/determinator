@@ -3,13 +3,14 @@ module Determinator
   #
   # @attr_reader [nil,Hash<String,Integer>] variants The variants for this experiment, with the name of the variant as the key and the weight as the value. Will be nil for non-experiments.
   class Feature
-    attr_reader :name, :identifier, :bucket_type, :variants, :target_groups, :active, :winning_variant
+    attr_reader :name, :identifier, :bucket_type, :variants, :target_groups, :fixed_determinations, :active, :winning_variant
 
-    def initialize(name:, identifier:, bucket_type:, target_groups:, variants: {}, overrides: {}, active: false, winning_variant: nil)
+    def initialize(name:, identifier:, bucket_type:, target_groups:, fixed_determinations: [], variants: {}, overrides: {}, active: false, winning_variant: nil)
       @name = name.to_s
       @identifier = (identifier || name).to_s
       @variants = variants
       @target_groups = parse_target_groups(target_groups)
+      @fixed_determinations = parse_fixed_determinations(fixed_determinations)
       @winning_variant = parse_outcome(winning_variant, allow_exclusion: false)
       @active = active
       @bucket_type = bucket_type.to_sym
@@ -72,14 +73,41 @@ module Determinator
 
       TargetGroup.new(
         rollout: target_group['rollout'].to_i,
-        constraints: constraints.each_with_object({}) do |(key, value), hash|
-          hash[key.to_s] = [*value].map(&:to_s)
-        end
+        constraints: parse_constraints(constraints)
       )
 
     # Invalid target groups are ignored
     rescue
       nil
+    end
+
+    def parse_fixed_determinations(fixed_determinations)
+      fixed_determinations.map(&method(:parse_fixed_determination)).compact
+    end
+
+    def parse_fixed_determination(fixed_determination)
+      return fixed_determination if fixed_determination.is_a? FixedDetermination
+
+      variant = fixed_determination['variant']
+      raise if variant && !variants.keys.include?(variant)
+
+      constraints = fixed_determination['constraints'].to_h
+
+      FixedDetermination.new(
+        active: fixed_determination['active'],
+        variant: variant,
+        constraints: parse_constraints(constraints)
+      )
+
+    # Invalid fixed determinations are ignored
+    rescue
+      nil
+    end
+
+    def parse_constraints(constraints)
+      constraints.each_with_object({}) do |(key, value), hash|
+        hash[key.to_s] = [*value].map(&:to_s)
+      end
     end
   end
 end
