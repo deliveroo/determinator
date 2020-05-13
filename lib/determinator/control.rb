@@ -84,6 +84,7 @@ module Determinator
       fixed_determination = choose_fixed_determination(feature, properties)
       # Given constraints have specified that this actor's determination should be fixed
       if fixed_determination
+        return false unless fixed_determination.on
         return true unless feature.experiment?
         return fixed_determination.variant
       end
@@ -118,8 +119,6 @@ module Determinator
       normalised_properties = normalise_properties(properties)
 
       feature.fixed_determinations.find { |fd|
-        next false unless fd.active
-
         matches_constraints(normalised_properties, fd.constraints)
       }
     end

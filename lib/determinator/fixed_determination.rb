@@ -1,20 +1,20 @@
 module Determinator
   class FixedDetermination
-    attr_reader :active, :variant, :constraints
+    attr_reader :on, :variant, :constraints
 
-    def initialize(active:, variant:, constraints: {})
-      @active = active
+    def initialize(on:, variant:, constraints: {})
+      @on = on
       @variant = variant
       @constraints = constraints
     end
 
     def inspect
-      "<active: #{active}, variant: #{variant}, constraints: #{constraints}"
+      "<on: #{on}, variant: #{variant}, constraints: #{constraints}"
     end
 
     def ==(other)
       return false unless other.is_a?(self.class)
-      other.active == active && other.variant == variant && other.constraints == constraints
+      other.on == on && other.variant == variant && other.constraints == constraints
     end
   end
 end
