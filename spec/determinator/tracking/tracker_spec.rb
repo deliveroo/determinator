@@ -22,7 +22,7 @@ describe Determinator::Tracking::Tracker do
 
   describe '#finish!' do
     let(:feature) { FactoryGirl.build(:feature, name: 'test_feature') }
-    let(:perform) { subject.finish!(error: true, foo: :bar) }
+    let(:perform) { subject.finish!(endpoint: 'test', error: true, foo: :bar) }
 
     before do
       allow(Process).to receive(:clock_gettime).and_return(1.0, 3.0)
@@ -35,6 +35,7 @@ describe Determinator::Tracking::Tracker do
 
     specify { expect(perform.start).to eq(1.0)}
     specify { expect(perform.type).to eq(:test) }
+    specify { expect(perform.endpoint).to eq('test') }
     specify { expect(perform.time).to eq(2.0) }
     specify { expect(perform.error).to eq(true) }
     specify { expect(perform.attributes).to eq({foo: :bar}) }

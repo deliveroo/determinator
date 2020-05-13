@@ -21,12 +21,13 @@ module Determinator
         )
       end
 
-      def finish!(error:, **attributes)
+      def finish!(endpoint:, error:, **attributes)
         request_time = now - @start
         Determinator::Tracking::Request.new(
           start: @start,
           type: type,
           time: request_time,
+          endpoint: endpoint,
           error: error,
           attributes: attributes,
           determinations: determinations,

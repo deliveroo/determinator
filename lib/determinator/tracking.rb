@@ -12,9 +12,9 @@ module Determinator
         Thread.current[:determinator_tracker] = Tracker.new(type)
       end
 
-      def finish!(error:, **attributes)
+      def finish!(endpoint:, error:, **attributes)
         return false unless started?
-        request = instance.finish!(error: error, **attributes)
+        request = instance.finish!(endpoint: endpoint, error: error, **attributes)
         clear!
         report(request)
         request

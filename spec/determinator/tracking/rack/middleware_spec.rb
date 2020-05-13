@@ -6,7 +6,7 @@ describe Determinator::Tracking::Rack::Middleware do
   let(:headers) { {} }
   let(:response) { 'foo' }
   let(:app) { double(call: [status, headers, response]) }
-  let(:env) { double }
+  let(:env) { {'REQUEST_METHOD' => 'GET', 'PATH_INFO' => '/test'} }
   let(:subject) { described_class.new(app) }
 
   describe '#call' do
@@ -37,6 +37,22 @@ describe Determinator::Tracking::Rack::Middleware do
       it 'sets the status' do
         subject.call(env)
         expect(@test_request.attributes[:status]).to eq(status)
+      end
+
+      it 'sets the endpoint' do
+        subject.call(env)
+        expect(@test_request.endpoint).to eq('GET /test')
+      end
+
+      context 'with a rails request' do
+        let(:env) do
+          super().merge('action_dispatch.request.path_parameters' => {controller: 'foo', action: 'test'} )
+        end
+
+        it 'sets the endpoint using controller info' do
+          subject.call(env)
+          expect(@test_request.endpoint).to eq('foo#test')
+        end
       end
 
       context 'when the request errors' do

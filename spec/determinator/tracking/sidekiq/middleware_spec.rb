@@ -51,6 +51,11 @@ describe Determinator::Tracking::Sidekiq::Middleware do
         expect(@test_request.attributes[:queue]).to eq('default')
       end
 
+      it 'sets the endpoint' do
+        TestWorker.perform_async('foo')
+        expect(@test_request.endpoint).to eq('TestWorker')
+      end
+
       context 'when the request errors' do
         it 'sets the error to true' do
           TestWorker.perform_async('error') rescue nil

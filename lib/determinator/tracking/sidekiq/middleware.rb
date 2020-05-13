@@ -18,7 +18,11 @@ module Determinator
             error = true
             raise
           ensure
-            Determinator::Tracking.finish!(queue: queue, error: !!error)
+            Determinator::Tracking.finish!(
+              endpoint: worker.class.name,
+              queue: queue,
+              error: !!error
+            )
           end
         end
       end
