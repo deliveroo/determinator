@@ -315,9 +315,7 @@ Determinator::Tracking.get_context do
 end
 ```
 
-NOTE: tracking is implemented by keeping the list of requests in a per-request thread-local variable, which means that determinations will only be tracked on the main thread.
-
-If your application is spinning out worker threads, you should make the determinations in the main thread if possible; or collect them from your worker threads and track them in the main thread with
+NOTE: determinations will only be recorded on the threads where Determinator::Tracking is initialised via the middleware. If offloading work away from these thread (for example, by spinning up new threads within a Rack request or a Sidekiq worker), make the determinations before, and pass them through to the new threads; or, if it's not possible, collect them manually and track them in the request's thread with
 ```
 Determinator::Tracking.track(id, guid, feature, determination)
 ```
