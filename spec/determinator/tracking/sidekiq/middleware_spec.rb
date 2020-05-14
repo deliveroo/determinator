@@ -51,6 +51,28 @@ describe Determinator::Tracking::Sidekiq::Middleware do
         expect(@test_request.attributes[:queue]).to eq('default')
       end
 
+      it 'sets the endpoint' do
+        TestWorker.perform_async('foo')
+        expect(@test_request.endpoint).to eq('TestWorker')
+      end
+
+      context 'with endpoint_env_vars' do
+        before do
+          Determinator::Tracking.endpoint_env_vars = ['__DETERMINATOR_TEST_ENV_VAR']
+          ENV['__DETERMINATOR_TEST_ENV_VAR'] = 'foo'
+        end
+
+        after do
+          Determinator::Tracking.endpoint_env_vars = nil
+          ENV.delete('__DETERMINATOR_TEST_ENV_VAR')
+        end
+
+        it 'adds the info from env' do
+          TestWorker.perform_async('foo')
+          expect(@test_request.endpoint).to eq('foo TestWorker')
+        end
+      end
+
       context 'when the request errors' do
         it 'sets the error to true' do
           TestWorker.perform_async('error') rescue nil

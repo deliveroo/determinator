@@ -16,7 +16,24 @@ module Determinator
           error = true
           raise
         ensure
-          Determinator::Tracking.finish!(status: status, error: !!error)
+          Determinator::Tracking.finish!(
+            status: status,
+            error: !!error,
+            endpoint: extract_endpoint(env)
+          )
+        end
+
+        private
+
+        def extract_endpoint(env)
+          parts = if params = env['action_dispatch.request.path_parameters']
+            [[params[:controller], params[:action]].join('#')]
+          else
+            [env['REQUEST_METHOD'], env['PATH_INFO'] || env['REQUEST_URI']]
+          end
+          Determinator::Tracking.collect_endpoint_info(parts)
+        rescue
+          env['PATH_INFO']
         end
       end
     end

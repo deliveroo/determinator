@@ -9,7 +9,8 @@ module Determinator
       def initialize(type)
         @determinations = []
         @type = type
-        @start = now
+        @monotonic_start = now
+        @start = Time.now
       end
 
       def track(id, guid, feature, determination)
@@ -21,12 +22,13 @@ module Determinator
         )
       end
 
-      def finish!(error:, **attributes)
-        request_time = now - @start
+      def finish!(endpoint:, error:, **attributes)
+        request_time = now - @monotonic_start
         Determinator::Tracking::Request.new(
           start: @start,
           type: type,
           time: request_time,
+          endpoint: endpoint,
           error: error,
           attributes: attributes,
           determinations: determinations,

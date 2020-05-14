@@ -1,3 +1,11 @@
+# Unreleased
+
+Feature:
+- Add endpoint information to tracking request
+
+Bug fix:
+- Make tracking request "start" attribute an actual time
+
 # 2.4.1
 
 Bug fix:
