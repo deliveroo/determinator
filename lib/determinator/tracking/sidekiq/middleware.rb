@@ -19,7 +19,7 @@ module Determinator
             raise
           ensure
             Determinator::Tracking.finish!(
-              endpoint: worker.class.name,
+              endpoint: Determinator::Tracking.collect_endpoint_info(worker.class.name),
               queue: queue,
               error: !!error
             )

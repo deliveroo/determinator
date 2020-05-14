@@ -289,11 +289,16 @@ end
 require 'determinator/tracking'
 
 Determinator::Tracking.on_request do |r|
-  Rails.logger.info("tag=determinator_request type=#{r.type} request_time=#{r.time} error=#{r.error?} response_status=#{r.attributes[:status]} sidekiq_queue=#{r.attributes[:queue]}")
+  Rails.logger.info("tag=determinator_request endpoint=#{r.endpoint} type=#{r.type} request_time=#{r.time} error=#{r.error?} response_status=#{r.attributes[:status]} sidekiq_queue=#{r.attributes[:queue]}")
   r.determinations.each do |d|
     Rails.logger.info("tag=determination id=#{d.id} guid=#{d.guid} flag=#{d.feature_id} result=#{d.determination}")
   end
 end
+
+# The library sets the "endpoint" with information about the request or sidekiq job. If you
+# have environment variables that further identify the service, e.g. ENV['APP_NAME'],
+# you can configure the tracker to prepend it to the endpoint:
+Determinator::Tracking.endpoint_env_vars = ['APP_NAME']
 
 # If using an APM, you can provide trace information on the request by providing a get_context hook: e.g.
 
@@ -310,7 +315,7 @@ Determinator::Tracking.get_context do
 end
 ```
 
-NOTE: this is implemented by keeping the list of requests in a per-request thread-local variable, which means that determinations will only be tracked on the main thread.
+NOTE: tracking is implemented by keeping the list of requests in a per-request thread-local variable, which means that determinations will only be tracked on the main thread.
 
 If your application is spinning out worker threads, you should make the determinations in the main thread if possible; or collect them from your worker threads and track them in the main thread with
 ```

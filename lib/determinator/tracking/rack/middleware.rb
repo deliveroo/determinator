@@ -26,11 +26,12 @@ module Determinator
         private
 
         def extract_endpoint(env)
-          if params = env['action_dispatch.request.path_parameters']
-            [params[:controller], params[:action]].join('#')
+          parts = if params = env['action_dispatch.request.path_parameters']
+            [[params[:controller], params[:action]].join('#')]
           else
-            [env['REQUEST_METHOD'], env['PATH_INFO'] || env['REQUEST_URI']].join(' ')
+            [env['REQUEST_METHOD'], env['PATH_INFO'] || env['REQUEST_URI']]
           end
+          Determinator::Tracking.collect_endpoint_info(parts)
         rescue
           env['PATH_INFO']
         end

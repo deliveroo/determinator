@@ -55,6 +55,23 @@ describe Determinator::Tracking::Rack::Middleware do
         end
       end
 
+      context 'with endpoint_env_vars' do
+        before do
+          Determinator::Tracking.endpoint_env_vars = ['__DETERMINATOR_TEST_ENV_VAR']
+          ENV['__DETERMINATOR_TEST_ENV_VAR'] = 'foo'
+        end
+
+        after do
+          Determinator::Tracking.endpoint_env_vars = nil
+          ENV.delete('__DETERMINATOR_TEST_ENV_VAR')
+        end
+
+        it 'adds the info from env' do
+          subject.call(env)
+          expect(@test_request.endpoint).to eq('foo GET /test')
+        end
+      end
+
       context 'when the request errors' do
         let(:error) { StandardError.new }
 

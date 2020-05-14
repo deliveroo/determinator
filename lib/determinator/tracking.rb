@@ -4,6 +4,8 @@ require 'determinator/tracking/context'
 module Determinator
   module Tracking
     class << self
+      attr_reader :endpoint_env_vars
+
       def instance
         Thread.current[:determinator_tracker]
       end
@@ -56,6 +58,16 @@ module Determinator
       def clear_hooks!
         @on_request = nil
         @get_context = nil
+      end
+
+      def endpoint_env_vars=(vars)
+        @endpoint_env_vars = Array(vars)
+      end
+
+      def collect_endpoint_info(parts)
+        endpoint = Array(Determinator::Tracking.endpoint_env_vars).map{ |v| ENV[v] }
+        endpoint += Array(parts)
+        endpoint.reject{ |p| p.nil? || p == ''}.join(' ')
       end
     end
   end
