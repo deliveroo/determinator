@@ -53,7 +53,7 @@ describe Determinator::Feature do
     let(:instance) { FactoryGirl.create(:experiment, fixed_determinations: [fixed_determination]) }
 
     context 'when the variant is not present in the variants' do
-      let(:fixed_determination) { {'on' => true, 'variant' => 'c', 'constraints' => {}} }
+      let(:fixed_determination) { {'feature_on' => true, 'variant' => 'c', 'constraints' => {}} }
 
       it 'should be ignored' do
         expect(instance.fixed_determinations).to be_empty
@@ -61,7 +61,7 @@ describe Determinator::Feature do
     end
 
     context 'when a variant is present and the fixed determination is not on' do
-      let(:fixed_determination) { {'on' => false, 'variant' => 'a', 'constraints' => {}} }
+      let(:fixed_determination) { {'feature_on' => false, 'variant' => 'a', 'constraints' => {}} }
 
       it 'should be ignored' do
         expect(instance.fixed_determinations).to be_empty

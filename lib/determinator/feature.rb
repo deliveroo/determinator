@@ -89,15 +89,15 @@ module Determinator
       return fixed_determination if fixed_determination.is_a? FixedDetermination
 
       variant = fixed_determination['variant']
-      raise if variant && !variants.keys.include?(variant)
+      return nil if variant && !variants.keys.include?(variant)
 
       # if a variant is present the fixed determination should always be on
-      raise if variant && !fixed_determination['on']
+      return nil if variant && !fixed_determination['feature_on']
 
       constraints = fixed_determination['constraints'].to_h
 
       FixedDetermination.new(
-        on: fixed_determination['on'],
+        feature_on: fixed_determination['feature_on'],
         variant: variant,
         constraints: parse_constraints(constraints)
       )
