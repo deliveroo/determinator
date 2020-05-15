@@ -1,4 +1,4 @@
-# Unreleased
+# 2.4.2
 
 Feature:
 - Add endpoint information to tracking request
