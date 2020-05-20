@@ -7,19 +7,21 @@ module Determinator
       attr_reader :type, :determinations
 
       def initialize(type)
-        @determinations = []
+        @determinations = Hash.new(0)
         @type = type
         @monotonic_start = now
         @start = Time.now
       end
 
       def track(id, guid, feature, determination)
-        determinations << Determinator::Tracking::Determination.new(
-          id: id,
-          guid: guid,
-          feature_id: feature.identifier,
-          determination: determination
-        )
+        determinations[
+          Determinator::Tracking::Determination.new(
+            id: id,
+            guid: guid,
+            feature_id: feature.identifier,
+            determination: determination
+          )
+        ] += 1
       end
 
       def finish!(endpoint:, error:, **attributes)

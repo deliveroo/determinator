@@ -13,6 +13,12 @@ module Determinator
       def ==(other)
         id == other.id && guid == other.guid && feature_id == other.feature_id && determination == other.determination
       end
+
+      alias eql? ==
+
+      def hash
+        [id, guid, feature_id, determination].hash
+      end
     end
   end
 end
