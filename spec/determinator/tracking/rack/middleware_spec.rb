@@ -41,7 +41,7 @@ describe Determinator::Tracking::Rack::Middleware do
 
       it 'sets the endpoint' do
         subject.call(env)
-        expect(@test_request.endpoint).to eq('GET /test')
+        expect(@test_request.endpoint).to eq('GET')
       end
 
       context 'with a rails request' do
@@ -51,7 +51,18 @@ describe Determinator::Tracking::Rack::Middleware do
 
         it 'sets the endpoint using controller info' do
           subject.call(env)
-          expect(@test_request.endpoint).to eq('foo#test')
+          expect(@test_request.endpoint).to eq('GET foo#test')
+        end
+      end
+
+      context 'with a sinatra request' do
+        let(:env) do
+          super().merge('sinatra.route' => 'POST /foo/bar' )
+        end
+
+        it 'sets the endpoint using controller info' do
+          subject.call(env)
+          expect(@test_request.endpoint).to eq('POST /foo/bar')
         end
       end
 
@@ -68,7 +79,7 @@ describe Determinator::Tracking::Rack::Middleware do
 
         it 'adds the info from env' do
           subject.call(env)
-          expect(@test_request.endpoint).to eq('foo GET /test')
+          expect(@test_request.endpoint).to eq('foo GET')
         end
       end
 
