@@ -1,3 +1,11 @@
+# 2.4.3
+
+Feature:
+- Add Sinatra endpoint tracking
+
+Bug fix:
+- Remove endpoint tracking of PATH_INFO
+
 # 2.4.2
 
 Feature:
