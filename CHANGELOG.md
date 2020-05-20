@@ -1,3 +1,8 @@
+# 2.4.4
+
+Bug fix:
+- Count repeated determinations instead of tracking separately
+
 # 2.4.3
 
 Feature:
