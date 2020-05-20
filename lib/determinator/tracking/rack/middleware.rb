@@ -27,9 +27,11 @@ module Determinator
 
         def extract_endpoint(env)
           parts = if params = env['action_dispatch.request.path_parameters']
-            [[params[:controller], params[:action]].join('#')]
+            [env['REQUEST_METHOD'], [params[:controller], params[:action]].join('#')]
+          elsif env['sinatra.route']
+            [env['sinatra.route']]
           else
-            [env['REQUEST_METHOD'], env['PATH_INFO'] || env['REQUEST_URI']]
+            [env['REQUEST_METHOD']]
           end
           Determinator::Tracking.collect_endpoint_info(parts)
         rescue
