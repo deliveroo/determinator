@@ -51,6 +51,15 @@ module Determinator
       end
     end
 
+    def explain_determination(name, id: nil, guid: nil, properties: {})
+      feature = Determinator.with_retrieval_cache(name) { retrieval.retrieve(name) }
+      return false if feature.nil? || feature.is_a?(ErrorResponse) || feature.is_a?(MissingResponse)
+
+      Determinator::Explainer.new.explain do
+        determinate(feature, id: id, guid: guid, properties: properties)
+      end
+    end
+
     def inspect
       '#<Determinator::Control>'
     end
@@ -90,11 +99,11 @@ module Determinator
       return false unless indicators
 
       # Actor's indicator has excluded them from the feature
-      return false if indicators.rollout >= target_group.rollout
+      return false unless included_in_rollout?(indicators, target_group)
 
       # Features don't need variant determination and, at this stage,
       # they have been rolled out to.
-      return true unless feature.experiment?
+      return true unless require_variant_determination?(feature)
 
       variant_for(feature, indicators.variant)
 
@@ -106,21 +115,33 @@ module Determinator
       false
     end
 
+    def included_in_rollout?(indicators, target_group)
+      indicators.rollout < target_group.rollout
+    end
+
+    def require_variant_determination?(feature)
+      feature.experiment?
+    end
+
     def choose_target_group(feature, properties)
       # Keys and values must be strings
       normalised_properties = properties.each_with_object({}) do |(name, values), hash|
         hash[name.to_s] = [*values].map(&:to_s)
       end
 
-      feature.target_groups.select { |tg|
+      # Must choose target group deterministically, if more than one match
+      filtered_target_groups(feature, normalised_properties).sort_by { |tg| tg.rollout }.last
+    end
+
+    def filtered_target_groups(feature, properties)
+      feature.target_groups.select do |tg|
         next false unless tg.rollout.between?(1, 65_536)
 
         tg.constraints.reduce(true) do |fit, (scope, *required)|
-          present = [*normalised_properties[scope]]
+          present = [*properties[scope]]
           fit && matches_requirements?(scope, required, present)
         end
-        # Must choose target group deterministically, if more than one match
-      }.sort_by { |tg| tg.rollout }.last
+      end
     end
 
     def matches_requirements?(scope, required, present)
@@ -169,6 +190,7 @@ module Determinator
         SecureRandom.hex(64)
       else
         Determinator.notice_error "Cannot process the '#{feature.bucket_type}' bucket type found in #{feature.name}"
+        nil
       end
     end
 

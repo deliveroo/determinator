@@ -1,8 +1,9 @@
 module Determinator
   class TargetGroup
-    attr_reader :rollout, :constraints
+    attr_reader :name, :rollout, :constraints
 
-    def initialize(rollout:, constraints: {})
+    def initialize(name: '', rollout:, constraints: {})
+      @name = name
       @rollout = rollout
       @constraints = constraints
     end
@@ -15,14 +16,17 @@ module Determinator
       Rational(rollout, 65_536)
     end
 
+    def percentage
+      (rollout_percent * 100).to_f.round(1)
+    end
+
     def inspect
-      pc = (rollout_percent * 100).to_f.round(1)
-      "<#{pc}% of those matching: #{constraints}>"
+      "<TG name:'#{name}': #{percentage}% of those matching: #{constraints}>"
     end
 
     def ==(other)
       return false unless other.is_a?(self.class)
-      other.rollout == rollout && other.constraints == constraints
+      other.name == name && other.rollout == rollout && other.constraints == constraints
     end
   end
 end

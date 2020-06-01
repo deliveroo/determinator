@@ -71,6 +71,7 @@ module Determinator
       constraints = target_group['constraints'].to_h
 
       TargetGroup.new(
+        name: target_group['name'],
         rollout: target_group['rollout'].to_i,
         constraints: constraints.each_with_object({}) do |(key, value), hash|
           hash[key.to_s] = [*value].map(&:to_s)
