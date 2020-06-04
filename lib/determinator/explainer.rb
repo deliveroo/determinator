@@ -99,8 +99,8 @@ module Determinator
 
     def explain
       trace.enable
-      yield
-      result
+      outcome = yield
+      { outcome: outcome, explanation: result }
     ensure
       trace.disable
     end
@@ -113,7 +113,7 @@ module Determinator
       TracePoint.new(:call, :return, :b_call, :b_return) do |tp|
         key = [tp.event, tp.defined_class, tp.method_id]
         if EVENTS_TO_MONITOR.include?(key)
-          param_names = tp.parameters.map(&:last)
+          param_names = tp.self.method(tp.method_id).parameters.map(&:last)
 
           args = param_names.map { |n| [n, @trace.binding.eval(n.to_s)] }.to_h
 
