@@ -5,8 +5,8 @@ module Determinator
       [:return, Determinator::Feature, :active?] => :feature_active?,
       [:return, Determinator::Feature, :overridden_for?] => :override?,
       [:return, Determinator::Feature, :override_value_for] => :override_match,
-      [:b_call, Determinator::Control, :filtered_target_groups] => :check_target_group,
-      [:b_return, Determinator::Control, :filtered_target_groups] => :target_group_match?,
+      [:call, Determinator::Control, :filter_target_group] => :check_target_group,
+      [:return, Determinator::Control, :filter_target_group] => :target_group_match?,
       [:return, Determinator::Control, :choose_target_group] => :choosen_target_group,
       [:return, Determinator::Control, :actor_identifier] => :actor,
       [:return, Determinator::Control, :included_in_rollout?] => :included_in_rollout?,
@@ -110,7 +110,7 @@ module Determinator
     attr_reader :trace, :result
 
     def configure_tracer
-      TracePoint.new(:call, :return, :b_call, :b_return) do |tp|
+      TracePoint.new(:call, :return) do |tp|
         key = [tp.event, tp.defined_class, tp.method_id]
         if EVENTS_TO_MONITOR.include?(key)
           param_names = tp.self.method(tp.method_id).parameters.map(&:last)
@@ -142,21 +142,21 @@ module Determinator
     end
 
     def check_target_group(tp, args)
-      if args.key?(:tg)
-        @result << MESSAGES[:check_target_group].dup.tap { |m| m[:title] = format(m[:title], tg_name: args[:tg].name || 'no name') }
+      if args.key?(:target_group)
+        @result << MESSAGES[:check_target_group].dup.tap { |m| m[:title] = format(m[:title], tg_name: args[:target_group].name || 'no name') }
       end
     end
 
     def target_group_match?(tp, args)
-      return unless args.key?(:tg)
+      return unless args.key?(:target_group)
       if tp.return_value == true
         @result << MESSAGES[:match_target_group].dup.tap do |m|
-          m[:title] = format(m[:title], tg_name: args[:tg].name || 'no name')
-          m[:subtitle] = format(m[:subtitle], percentage: args[:tg].percentage)
+          m[:title] = format(m[:title], tg_name: args[:target_group].name || 'no name')
+          m[:subtitle] = format(m[:subtitle], percentage: args[:target_group].percentage)
         end
       else
         @result << MESSAGES[:no_match_target_group].dup.tap do |m|
-          m[:title] = format(m[:title], tg_name: args[:tg].name || 'no name')
+          m[:title] = format(m[:title], tg_name: args[:target_group].name || 'no name')
         end
       end
     end

@@ -135,12 +135,16 @@ module Determinator
 
     def filtered_target_groups(feature, properties)
       feature.target_groups.select do |tg|
-        next false unless tg.rollout.between?(1, 65_536)
+        filter_target_group(tg, properties)
+      end
+    end
 
-        tg.constraints.reduce(true) do |fit, (scope, *required)|
-          present = [*properties[scope]]
-          fit && matches_requirements?(scope, required, present)
-        end
+    def filter_target_group(target_group, properties)
+      return false unless target_group.rollout.between?(1, 65_536)
+
+      target_group.constraints.reduce(true) do |fit, (scope, *required)|
+        present = [*properties[scope]]
+        fit && matches_requirements?(scope, required, present)
       end
     end
 
