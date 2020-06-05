@@ -37,7 +37,7 @@ describe Determinator::Tracking do
   describe '.finish!' do
     context 'when not started' do
       it 'returns false' do
-        expect(described_class.finish!(error: true) ).to eq(false)
+        expect(described_class.finish!(endpoint: 'test', error: true) ).to eq(false)
       end
     end
 
@@ -50,19 +50,23 @@ describe Determinator::Tracking do
       end
 
       it 'returns a request' do
-        expect(described_class.finish!(error: false, foo: :bar)).to be_a(Determinator::Tracking::Request)
+        expect(described_class.finish!(endpoint: 'test', error: false, foo: :bar)).to be_a(Determinator::Tracking::Request)
       end
 
       it 'sets the error status' do
-        expect(described_class.finish!(error: true, foo: :bar).error).to eq(true)
+        expect(described_class.finish!(endpoint: 'test', error: true, foo: :bar).error).to eq(true)
       end
 
       it 'sets the type' do
-        expect(described_class.finish!(error: false, foo: :bar).type).to eq(:test)
+        expect(described_class.finish!(endpoint: 'test', error: false, foo: :bar).type).to eq(:test)
+      end
+
+      it 'sets the endpoint' do
+        expect(described_class.finish!(endpoint: 'test', error: false, foo: :bar).endpoint).to eq('test')
       end
 
       it 'sets the attributes' do
-        expect(described_class.finish!(error: false, foo: :bar).attributes).to eq({foo: :bar})
+        expect(described_class.finish!(endpoint: 'test', error: false, foo: :bar).attributes).to eq({foo: :bar})
       end
 
       context 'when reporting is enabled' do
@@ -76,7 +80,7 @@ describe Determinator::Tracking do
         end
 
         it 'calls the reporter' do
-          expect{ described_class.finish!(error: false, foo: :bar) }.to change{ $_test_request }
+          expect{ described_class.finish!(endpoint: 'test', error: false, foo: :bar) }.to change{ $_test_request }
             .from(nil)
             .to(instance_of(Determinator::Tracking::Request))
         end
@@ -94,7 +98,7 @@ describe Determinator::Tracking do
         end
 
         it 'sets the context' do
-          expect(described_class.finish!(error: false, foo: :bar).context.request_id).to eq('abc')
+          expect(described_class.finish!(endpoint: 'test', error: false, foo: :bar).context.request_id).to eq('abc')
         end
       end
     end

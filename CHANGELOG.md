@@ -3,6 +3,27 @@
 Feature:
 - Add fixed determinations
 
+# 2.4.4
+
+Bug fix:
+- Count repeated determinations instead of tracking separately
+
+# 2.4.3
+
+Feature:
+- Add Sinatra endpoint tracking
+
+Bug fix:
+- Remove endpoint tracking of PATH_INFO
+
+# 2.4.2
+
+Feature:
+- Add endpoint information to tracking request
+
+Bug fix:
+- Make tracking request "start" attribute an actual time
+
 # 2.4.1
 
 Bug fix:
