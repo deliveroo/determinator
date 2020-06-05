@@ -84,7 +84,7 @@ module Determinator
       fixed_determination = choose_fixed_determination(feature, properties)
       # Given constraints have specified that this actor's determination should be fixed
       if fixed_determination
-        return false unless fixed_determination.on
+        return false unless fixed_determination.feature_on
         return true unless feature.experiment?
         return fixed_determination.variant
       end
