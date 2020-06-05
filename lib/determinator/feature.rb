@@ -7,7 +7,7 @@ module Determinator
 
     def initialize(name:, identifier:, bucket_type:, target_groups:, fixed_determinations: [], variants: {}, overrides: {}, active: false, winning_variant: nil)
       @name = name.to_s
-      @identifier = (identifier || name).to_s
+      @identifier = identifier.to_s
       @variants = variants
       @target_groups = parse_target_groups(target_groups)
       @fixed_determinations = parse_fixed_determinations(fixed_determinations)
