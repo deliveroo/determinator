@@ -81,6 +81,14 @@ module Determinator
 
       return feature.override_value_for(id) if feature.overridden_for?(id)
 
+      fixed_determination = choose_fixed_determination(feature, properties)
+      # Given constraints have specified that this actor's determination should be fixed
+      if fixed_determination
+        return false unless fixed_determination.feature_on
+        return true unless feature.experiment?
+        return fixed_determination.variant
+      end
+
       target_group = choose_target_group(feature, properties)
       # Given constraints have excluded this actor from this experiment
       return false unless target_group
@@ -106,21 +114,32 @@ module Determinator
       false
     end
 
+    def choose_fixed_determination(feature, properties)
+      # Keys and values must be strings
+      normalised_properties = normalise_properties(properties)
+
+      feature.fixed_determinations.find { |fd|
+        matches_constraints(normalised_properties, fd.constraints)
+      }
+    end
+
     def choose_target_group(feature, properties)
       # Keys and values must be strings
-      normalised_properties = properties.each_with_object({}) do |(name, values), hash|
-        hash[name.to_s] = [*values].map(&:to_s)
-      end
+      normalised_properties = normalise_properties(properties)
 
       feature.target_groups.select { |tg|
         next false unless tg.rollout.between?(1, 65_536)
 
-        tg.constraints.reduce(true) do |fit, (scope, *required)|
-          present = [*normalised_properties[scope]]
-          fit && matches_requirements?(scope, required, present)
-        end
+        matches_constraints(normalised_properties, tg.constraints)
         # Must choose target group deterministically, if more than one match
       }.sort_by { |tg| tg.rollout }.last
+    end
+
+    def matches_constraints(normalised_properties, constraints)
+      constraints.reduce(true) do |fit, (scope, *required)|
+        present = [*normalised_properties[scope]]
+        fit && matches_requirements?(scope, required, present)
+      end
     end
 
     def matches_requirements?(scope, required, present)
@@ -204,6 +223,14 @@ module Determinator
       end
 
       raise ArgumentError, "A variant should have been found by this point, there is a bug in the code."
+    end
+
+    private
+
+    def normalise_properties(properties)
+      properties.each_with_object({}) do |(name, values), hash|
+        hash[name.to_s] = [*values].map(&:to_s)
+      end
     end
   end
 end

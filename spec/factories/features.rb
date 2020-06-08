@@ -21,15 +21,6 @@ FactoryGirl.define do
       constraints Hash.new
     end
 
-    trait :full_rollout do
-      rollout 65_536
-      constraints Hash.new
-    end
-
-    trait :with_overrides do
-      overrides Hash[[['123', false]]]
-    end
-
     trait :active do
       active true
     end

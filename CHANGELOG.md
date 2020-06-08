@@ -1,3 +1,8 @@
+# 2.5.0
+
+Feature:
+- Add fixed determinations
+
 # 2.4.4
 
 Bug fix:
