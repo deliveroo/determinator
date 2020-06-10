@@ -1,8 +1,9 @@
 module Determinator
   class FixedDetermination
-    attr_reader :feature_on, :variant, :constraints
+    attr_reader :name, :feature_on, :variant, :constraints
 
-    def initialize(feature_on:, variant:, constraints: {})
+    def initialize(feature_on:, variant:, name: '', constraints: {})
+      @name = name
       @feature_on = feature_on
       @variant = variant
       @constraints = constraints
@@ -10,6 +11,10 @@ module Determinator
 
     def inspect
       "<feature_on: #{feature_on}, variant: #{variant}, constraints: #{constraints}"
+    end
+
+    def to_explain_params
+      { name: name }
     end
 
     def ==(other)

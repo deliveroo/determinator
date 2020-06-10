@@ -11,6 +11,7 @@ RSpec.describe Determinator::Retrieve::File do
     identifier: "feature",
     bucket_type: "id",
     target_groups: [{
+      name: '',
       rollout: 65536,
       constraints: {}
     }],

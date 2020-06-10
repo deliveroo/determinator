@@ -1,8 +1,9 @@
 module Determinator
   class TargetGroup
-    attr_reader :rollout, :constraints
+    attr_reader :name, :rollout, :constraints
 
-    def initialize(rollout:, constraints: {})
+    def initialize(rollout:, name: '', constraints: {})
+      @name = name
       @rollout = rollout
       @constraints = constraints
     end
@@ -15,9 +16,16 @@ module Determinator
       Rational(rollout, 65_536)
     end
 
+    def humanize_percentage
+      (rollout_percent * 100).to_f.round(1)
+    end
+
     def inspect
-      pc = (rollout_percent * 100).to_f.round(1)
-      "<#{pc}% of those matching: #{constraints}>"
+      "<TG name:'#{name}': #{humanize_percentage}% of those matching: #{constraints}>"
+    end
+
+    def to_explain_params
+      { name: name, rollout_percent: humanize_percentage }
     end
 
     def ==(other)
