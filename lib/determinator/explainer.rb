@@ -2,6 +2,9 @@ require 'determinator/explainer/messages'
 
 module Determinator
   class Explainer
+    attr_accessor :enabled
+    attr_reader :logs
+
     def initialize
       @logs  = []
       @enabled = false
