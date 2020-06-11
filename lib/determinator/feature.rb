@@ -58,6 +58,10 @@ module Determinator
       Marshal.dump(self) == Marshal.dump(other)
     end
 
+    def to_explain_params
+      { name: name, identifier: identifier, bucket_type: bucket_type }
+    end
+
     private
 
     attr_reader :overrides
@@ -72,6 +76,7 @@ module Determinator
       constraints = target_group['constraints'].to_h
 
       TargetGroup.new(
+        name: target_group['name'],
         rollout: target_group['rollout'].to_i,
         constraints: parse_constraints(constraints)
       )
@@ -97,6 +102,7 @@ module Determinator
       constraints = fixed_determination['constraints'].to_h
 
       FixedDetermination.new(
+        name: fixed_determination['name'],
         feature_on: fixed_determination['feature_on'],
         variant: variant,
         constraints: parse_constraints(constraints)

@@ -1,3 +1,8 @@
+# 2.5.1
+
+Feature:
+- Add explain functionality for determinations
+
 # 2.5.0
 
 Feature:

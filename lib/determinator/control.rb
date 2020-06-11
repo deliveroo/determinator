@@ -5,10 +5,11 @@ require 'securerandom'
 
 module Determinator
   class Control
-    attr_reader :retrieval
+    attr_reader :retrieval, :explainer
 
     def initialize(retrieval:)
       @retrieval = retrieval
+      @explainer = Determinator::Explainer.new
     end
 
     # Creates a new determinator instance which assumes the actor id, guid and properties given
@@ -51,6 +52,12 @@ module Determinator
       end
     end
 
+    def explain_determination(name, id: nil, guid: nil, properties: {})
+      explainer.explain do
+        determinate_and_notice(name, id: id, guid: guid, properties: properties)
+      end
+    end
+
     def inspect
       '#<Determinator::Control>'
     end
@@ -76,17 +83,19 @@ module Determinator
       # Calling method can place constraints on the feature, eg. experiment only
       return false if block_given? && !yield(feature)
 
-      # Inactive features are always, always off
-      return false unless feature.active?
+      explainer.log(:start, { feature: feature } )
 
-      return feature.override_value_for(id) if feature.overridden_for?(id)
+      # Inactive features are always, always off
+      return false unless feature_active?(feature)
+
+      return override_value(feature, id) if feature_overridden?(feature, id)
 
       fixed_determination = choose_fixed_determination(feature, properties)
       # Given constraints have specified that this actor's determination should be fixed
       if fixed_determination
-        return false unless fixed_determination.feature_on
-        return true unless feature.experiment?
-        return fixed_determination.variant
+        return explainer.log(:chosen_fixed_determination, { fixed_determination: fixed_determination }) {
+          fixed_determination_value(feature, fixed_determination)
+        }
       end
 
       target_group = choose_target_group(feature, properties)
@@ -98,14 +107,18 @@ module Determinator
       return false unless indicators
 
       # Actor's indicator has excluded them from the feature
-      return false if indicators.rollout >= target_group.rollout
+      return false if excluded_from_rollout?(indicators, target_group)
 
       # Features don't need variant determination and, at this stage,
       # they have been rolled out to.
-      return true unless feature.experiment?
+      # require_variant_determination?
+      return true unless require_variant_determination?(feature)
 
-      variant_for(feature, indicators.variant)
 
+
+      explainer.log(:chosen_variant) {
+        variant_for(feature, indicators.variant)
+      }
     rescue ArgumentError
       raise
 
@@ -114,25 +127,83 @@ module Determinator
       false
     end
 
+    def feature_active?(feature)
+      explainer.log(:feature_active) {
+        feature.active?
+      }
+    end
+
+    def feature_overridden?(feature, id)
+      explainer.log(:feature_overridden_for) {
+        feature.overridden_for?(id)
+      }
+    end
+
+    def override_value(feature, id)
+      explainer.log(:override_value, { id: id }) {
+        feature.override_value_for(id)
+      }
+    end
+
+    def excluded_from_rollout?(indicators, target_group)
+      explainer.log(:excluded_from_rollout, { target_group: target_group } ) {
+        indicators.rollout >= target_group.rollout
+      }
+    end
+
+    def require_variant_determination?(feature)
+      explainer.log(:require_variant_determination) {
+        feature.experiment?
+      }
+    end
+
+    def fixed_determination_value(feature, fixed_determination)
+      return false unless fixed_determination.feature_on
+      return true unless feature.experiment?
+      return fixed_determination.variant
+    end
+
     def choose_fixed_determination(feature, properties)
       # Keys and values must be strings
       normalised_properties = normalise_properties(properties)
 
-      feature.fixed_determinations.find { |fd|
-        matches_constraints(normalised_properties, fd.constraints)
-      }
+      feature.fixed_determinations.find do |fd|
+        explainer.log(:possible_match_fixed_determination, { fixed_determination: fd }) {
+          check_fixed_determination(fd, normalised_properties)
+        }
+      end
+    end
+
+    def check_fixed_determination(fixed_determination, properties)
+      explainer.log(:check_fixed_determination, { fixed_determination: fixed_determination })
+
+      matches_constraints(properties, fixed_determination.constraints)
     end
 
     def choose_target_group(feature, properties)
       # Keys and values must be strings
       normalised_properties = normalise_properties(properties)
 
-      feature.target_groups.select { |tg|
-        next false unless tg.rollout.between?(1, 65_536)
+      # Must choose target group deterministically, if more than one match
+      explainer.log(:chosen_target_group) {
+        filtered_target_groups(feature, normalised_properties).sort_by { |tg| tg.rollout }.last
+      }
+    end
 
-        matches_constraints(normalised_properties, tg.constraints)
-        # Must choose target group deterministically, if more than one match
-      }.sort_by { |tg| tg.rollout }.last
+    def filtered_target_groups(feature, properties)
+      feature.target_groups.select do |tg|
+        explainer.log(:possible_match_target_group, { target_group: tg }) {
+          check_target_group(tg, properties)
+        }
+      end
+    end
+
+    def check_target_group(target_group, properties)
+      explainer.log(:check_target_group, { target_group: target_group })
+
+      return false unless target_group.rollout.between?(1, 65_536)
+
+      matches_constraints(properties, target_group.constraints)
     end
 
     def matches_constraints(normalised_properties, constraints)
@@ -174,10 +245,12 @@ module Determinator
     def actor_identifier(feature, id, guid)
       case feature.bucket_type
       when :id
+        explainer.log(:missing_identifier, { identifier_type: 'ID' }) unless id
         id
       when :guid
         return guid if guid.to_s != ''
 
+        explainer.log(:missing_identifier, { identifier_type: 'GUID' })
         raise ArgumentError, 'A GUID must always be given for GUID bucketed features'
       when :fallback
         identifier = (id || guid).to_s
@@ -187,6 +260,7 @@ module Determinator
       when :single
         SecureRandom.hex(64)
       else
+        explainer.log(:unknown_bucket, { feature: feature } )
         Determinator.notice_error "Cannot process the '#{feature.bucket_type}' bucket type found in #{feature.name}"
       end
     end
