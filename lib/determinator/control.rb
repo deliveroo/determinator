@@ -30,9 +30,10 @@ module Determinator
     # @param :id [#to_s] The id of the actor being determinated for
     # @param :guid [#to_s] The Anonymous id of the actor being determinated for
     # @param :properties [Hash<Symbol,String>] The properties of this actor which will be used for including this actor or not
+    # @param :feature [Feature] The feature to use instead of retrieving one
     # @raise [ArgumentError] When the arguments given to this method aren't ever going to produce a useful response
     # @return [true,false] Whether the feature is on (true) or off (false) for this actor
-    def feature_flag_on?(name, id: nil, guid: nil, properties: {})
+    def feature_flag_on?(name, id: nil, guid: nil, properties: {}, feature: nil)
       determinate_and_notice(name, id: id, guid: guid, properties: properties) do |feature|
         feature.feature_flag?
       end
@@ -44,10 +45,11 @@ module Determinator
     # @param :id [#to_s] The id of the actor being determinated for
     # @param :guid [#to_s] The Anonymous id of the actor being determinated for
     # @param :properties [Hash<Symbol,String>] The properties of this actor which will be used for including this actor or not
+    # @param :feature [Feature] The feature to use instead of retrieving one
     # @raise [ArgumentError] When the arguments given to this method aren't ever going to produce a useful response
     # @return [false,String] Returns false, if the actor is not in this experiment, or otherwise the variant name.
-    def which_variant(name, id: nil, guid: nil, properties: {})
-      determinate_and_notice(name, id: id, guid: guid, properties: properties) do |feature|
+    def which_variant(name, id: nil, guid: nil, properties: {}, feature: nil)
+      determinate_and_notice(name, id: id, guid: guid, properties: properties, feature: nil) do |feature|
         feature.experiment?
       end
     end
@@ -58,6 +60,14 @@ module Determinator
       end
     end
 
+    # Uses the retrieval (and a cache if set on the Determinator config) to fetch a feature definition.
+    #
+    # @param name [#to_s] The name of the experiment being checked
+    # @return [Feature, MissingResponse] Returns the Feature object, or MissingResponse if the feature is not found.
+    def retrieve(name)
+      Determinator.with_retrieval_cache(name) { retrieval.retrieve(name) }
+    end
+
     def inspect
       '#<Determinator::Control>'
     end
@@ -66,8 +76,8 @@ module Determinator
 
     Indicators = Struct.new(:rollout, :variant)
 
-    def determinate_and_notice(name, id:, guid:, properties:)
-      feature = Determinator.with_retrieval_cache(name) { retrieval.retrieve(name) }
+    def determinate_and_notice(name, id:, guid:, properties:, feature: nil)
+      feature ||= retrieve(name)
 
       if feature.nil? || feature.is_a?(ErrorResponse) || feature.is_a?(MissingResponse)
         Determinator.notice_missing_feature(name)
