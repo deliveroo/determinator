@@ -1,3 +1,10 @@
+# 2.5.2
+
+Feature:
+- Add structured_bucket to Feature
+- Add `#retrieve` method to the Control
+- Add optional `feature` argument to `feature_flag_on?` and `which_variant`, to reuse an existing feature
+
 # 2.5.1
 
 Feature:

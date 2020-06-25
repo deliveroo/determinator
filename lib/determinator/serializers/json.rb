@@ -15,6 +15,7 @@ module Determinator
             name:                 obj['name'],
             identifier:           obj['identifier'],
             bucket_type:          obj['bucket_type'],
+            structured_bucket:    obj['structured_bucket'],
             active:               (obj['active'] === true),
             target_groups:        obj['target_groups'],
             fixed_determinations: obj['fixed_determinations'].to_a,

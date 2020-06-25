@@ -3,9 +3,9 @@ module Determinator
   #
   # @attr_reader [nil,Hash<String,Integer>] variants The variants for this experiment, with the name of the variant as the key and the weight as the value. Will be nil for non-experiments.
   class Feature
-    attr_reader :name, :identifier, :bucket_type, :variants, :target_groups, :fixed_determinations, :active, :winning_variant
+    attr_reader :name, :identifier, :bucket_type, :structured_bucket, :variants, :target_groups, :fixed_determinations, :active, :winning_variant
 
-    def initialize(name:, identifier:, bucket_type:, target_groups:, fixed_determinations: [], variants: {}, overrides: {}, active: false, winning_variant: nil)
+    def initialize(name:, identifier:, bucket_type:, target_groups:, structured_bucket: nil, fixed_determinations: [], variants: {}, overrides: {}, active: false, winning_variant: nil)
       @name = name.to_s
       @identifier = identifier.to_s
       @variants = variants
@@ -14,6 +14,7 @@ module Determinator
       @winning_variant = parse_outcome(winning_variant, allow_exclusion: false)
       @active = active
       @bucket_type = bucket_type.to_sym
+      @structured_bucket = structured_bucket
 
       # To prevent confusion between actor id data types
       @overrides = overrides.each_with_object({}) do |(identifier, outcome), hash|
@@ -34,6 +35,11 @@ module Determinator
     # @return [true,false] Is this feature a feature flag?
     def feature_flag?
       variants.empty?
+    end
+
+    # @return [true,false] Is this feature using structured identification?
+    def structured?
+      !!structured_bucket && !structured_bucket.empty?
     end
 
     # Is this feature overridden for the given actor id?

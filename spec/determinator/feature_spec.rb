@@ -49,6 +49,28 @@ describe Determinator::Feature do
     end
   end
 
+  describe '#structured?' do
+    subject { feature.structured? }
+
+    context 'when feature is not structured' do
+      let(:feature) { FactoryGirl.create(:feature) }
+
+      it { should eq false }
+
+      context 'when structured_bucket is an empty string' do
+        let(:feature) { FactoryGirl.create(:feature, structured_bucket: '') }
+
+        it { should eq false }
+      end
+    end
+
+    context 'when feature is structured' do
+      let(:feature) { FactoryGirl.create(:feature, :structured) }
+
+      it { should eq true }
+    end
+  end
+
   describe 'when a fixed determination is present' do
     let(:instance) { FactoryGirl.create(:experiment, fixed_determinations: [fixed_determination]) }
 

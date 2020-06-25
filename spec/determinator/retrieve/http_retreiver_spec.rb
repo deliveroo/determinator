@@ -15,6 +15,7 @@ RSpec.describe Determinator::Retrieve::HttpRetriever do
       name: "Feature one",
       identifier: "feature",
       bucket_type: "id",
+      structured_bucket: "request.customer.guid",
       target_groups: [{
         rollout: 65536,
         constraints: {}

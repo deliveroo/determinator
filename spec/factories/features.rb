@@ -3,6 +3,7 @@ FactoryGirl.define do
     sequence :name
     identifier { name }
     bucket_type :guid
+    structured_bucket nil
     active false
 
     # Not an experiment by default
@@ -23,6 +24,10 @@ FactoryGirl.define do
 
     trait :active do
       active true
+    end
+
+    trait :structured do
+      structured_bucket 'request.customer.guid'
     end
 
     factory :experiment, class: Determinator::Feature do
