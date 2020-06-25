@@ -34,7 +34,7 @@ module Determinator
     # @raise [ArgumentError] When the arguments given to this method aren't ever going to produce a useful response
     # @return [true,false] Whether the feature is on (true) or off (false) for this actor
     def feature_flag_on?(name, id: nil, guid: nil, properties: {}, feature: nil)
-      determinate_and_notice(name, id: id, guid: guid, properties: properties) do |feature|
+      determinate_and_notice(name, id: id, guid: guid, properties: properties, feature: feature) do |feature|
         feature.feature_flag?
       end
     end
@@ -49,7 +49,7 @@ module Determinator
     # @raise [ArgumentError] When the arguments given to this method aren't ever going to produce a useful response
     # @return [false,String] Returns false, if the actor is not in this experiment, or otherwise the variant name.
     def which_variant(name, id: nil, guid: nil, properties: {}, feature: nil)
-      determinate_and_notice(name, id: id, guid: guid, properties: properties, feature: nil) do |feature|
+      determinate_and_notice(name, id: id, guid: guid, properties: properties, feature: feature) do |feature|
         feature.experiment?
       end
     end
