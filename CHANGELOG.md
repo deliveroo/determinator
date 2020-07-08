@@ -1,3 +1,8 @@
+# 2.5.3
+
+Bug fix:
+- Avoid errors when updating the gem and using persistent cache resulting in null fixed_determinations
+
 # 2.5.2
 
 Feature:
