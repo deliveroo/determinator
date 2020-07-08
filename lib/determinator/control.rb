@@ -174,6 +174,8 @@ module Determinator
     end
 
     def choose_fixed_determination(feature, properties)
+      return unless feature.fixed_determinations
+
       # Keys and values must be strings
       normalised_properties = normalise_properties(properties)
 
