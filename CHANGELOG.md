@@ -1,3 +1,8 @@
+# 2.5.4
+
+Bug fix:
+- Apply app_version logic to structured request.app_version too
+
 # 2.5.3
 
 Bug fix:

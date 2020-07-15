@@ -228,6 +228,7 @@ module Determinator
     def matches_requirements?(scope, required, present)
       case scope
         when "app_version" then has_any_app_version?(required, present)
+        when "request.app_version" then has_any_app_version?(required, present)
         else has_any?(required, present)
       end
     end
