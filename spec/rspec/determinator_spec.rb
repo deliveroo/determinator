@@ -2,7 +2,7 @@ require 'rspec/determinator'
 
 # Determinator config is always done outside tests, this
 # emulates that.
-Determinator.configure(retrieval: nil)
+Determinator.configure(retrieval: nil, feature_cache: RSpec::Determinator::DO_NOT_USE_IN_PRODUCTION_CODE_NULL_FEATURE_CACHE)
 
 describe RSpec::Determinator, :determinator_support do
   subject(:determinator) { Determinator.instance }

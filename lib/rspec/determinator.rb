@@ -3,6 +3,9 @@ require_relative '../determinator/retrieve/in_memory_retriever'
 
 module RSpec
   module Determinator
+
+    DO_NOT_USE_IN_PRODUCTION_CODE_NULL_FEATURE_CACHE = -> (name, &block) { block.call(name) }
+
     def self.included(by)
       by.extend(DSL)
 
@@ -12,10 +15,10 @@ module RSpec
         old_retriever = ::Determinator.instance.retrieval
         begin
           fake_retriever.clear!
-          ::Determinator.configure(retrieval: fake_retriever)
+          ::Determinator.configure(retrieval: fake_retriever, feature_cache: DO_NOT_USE_IN_PRODUCTION_CODE_NULL_FEATURE_CACHE)
           example.run
         ensure
-          ::Determinator.configure(retrieval: old_retriever)
+          ::Determinator.configure(retrieval: old_retriever, feature_cache: DO_NOT_USE_IN_PRODUCTION_CODE_NULL_FEATURE_CACHE)
         end
       end
     end
