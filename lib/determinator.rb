@@ -15,10 +15,10 @@ module Determinator
   class << self
     attr_reader :feature_cache, :retrieval
     # @param :retrieval [Determinator::Retrieve::Routemaster] A retrieval instance for Features
+    # @param :feature_cache [#call] a caching proc, accepting a feature name, which will return the named feature or yield (and store) if not available
     # @param :errors [#call, nil] a proc, accepting an error, which will be called with any errors which occur while determinating
     # @param :missing_feature [#call, nil] a proc, accepting a feature name, which will be called any time a feature is requested but isn't available
-    # @param :feature_cache [#call] a caching proc, accepting a feature name, which will return the named feature or yield (and store) if not available
-    def configure(retrieval:, errors: nil, missing_feature: nil, feature_cache:)
+    def configure(retrieval:, feature_cache:, errors: nil, missing_feature: nil)
       self.on_error(&errors) if errors
       self.on_missing_feature(&missing_feature) if missing_feature
       @feature_cache = feature_cache
