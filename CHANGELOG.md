@@ -1,3 +1,8 @@
+# 2.6.0
+
+Interface change:
+- A `feature_cache` is now required to use Determinator. See the `examples/determinator-rails/config/initializers/determinator.rb` for a quick start.
+
 # 2.5.4
 
 Bug fix:
