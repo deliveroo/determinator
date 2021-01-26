@@ -1,0 +1,19 @@
+{
+  "id": "welcome_emoji",
+  "identifier": "welcome_emoji",
+  "name": "What emoji should be used for the example hello",
+  "active": true,
+  "bucket_type": "guid",
+  "variants": {
+    "👋": 1,
+    "🎉": 1
+  },
+  "winning_variant": null,
+  "target_groups": [
+    {
+      "name": "50% of users",
+      "rollout": 32768,
+      "constraints": {}
+    }
+  ]
+}

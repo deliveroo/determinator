@@ -1,7 +1,9 @@
-require 'determinator/retrieve/dynaconf'
+require 'determinator/retrieve/file'
 require 'active_support/cache'
 
-retrieval = Determinator::Retrieve::Dynaconf.new(base_url: 'http://localhost:2345', service_name: 'determinator-rails')
+# File retriever just for example; use a Dynaconf retriever in your app
+# retrieval = Determinator::Retrieve::Dynaconf.new(base_url: ENV['DYNACONF_URL'], service_name: 'determinator-rails')
+retrieval = Determinator::Retrieve::File.new(root: File.join(__dir__, "../../example_features"))
 feature_cache = Determinator::Cache::FetchWrapper.new(
   ActiveSupport::Cache::MemoryStore.new(expires_in: 1.minute)
 )

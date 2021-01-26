@@ -1,0 +1,14 @@
+{
+  "id": "colloquial_welcome",
+  "identifier": "colloquial_welcome",
+  "name": "Whether a colloquial welcome should be used",
+  "active": true,
+  "bucket_type": "guid",
+  "target_groups": [
+    {
+      "name": "50% of users",
+      "rollout": 32768,
+      "constraints": {}
+    }
+  ]
+}
