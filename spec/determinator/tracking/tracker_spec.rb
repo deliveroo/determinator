@@ -6,7 +6,7 @@ describe Determinator::Tracking::Tracker do
   subject{ described_class.new(type) }
 
   describe '#track' do
-    let(:feature) { FactoryGirl.build(:feature, name: 'test_feature') }
+    let(:feature) { FactoryBot.build(:feature, name: 'test_feature') }
     let(:perform) { subject.track(123, 'abc', feature, 'A') }
     let(:determination) { Determinator::Tracking::Determination.new(id: 123, guid: 'abc', feature_id: 'test_feature', determination: 'A') }
 
@@ -36,7 +36,7 @@ describe Determinator::Tracking::Tracker do
   end
 
   describe '#finish!' do
-    let(:feature) { FactoryGirl.build(:feature, name: 'test_feature') }
+    let(:feature) { FactoryBot.build(:feature, name: 'test_feature') }
     let(:perform) { subject.finish!(endpoint: 'test', error: true, foo: :bar) }
     let(:time)    { Time.now }
 

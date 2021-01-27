@@ -3,7 +3,7 @@ require 'active_support/cache'
 
 RSpec.describe Determinator::Cache::FetchWrapper do
   let(:described_instance) { described_class.new(*caches) }
-  let(:feature) { FactoryGirl.create(:feature) }
+  let(:feature) { FactoryBot.create(:feature) }
   subject(:described_method) do
     described_instance.call(feature.name){ retrieval_response }
   end
