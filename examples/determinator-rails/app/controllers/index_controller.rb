@@ -5,9 +5,13 @@ class IndexController < ApplicationController
 
     message = [
       is_colloquial ? "hi world" : "hello world",
-      emoji
+      (emoji if emoji)
     ].compact.join(" ")
 
-    render json: { welcome: message }
+    explain = "An experiment and a feature flag are being checked for the user with guid #{guid}. "
+    explain += "The feature flag (colloquial_welcome) is #{is_colloquial ? 'on' : 'off'}. "
+    explain += "The experiment (welcome_emoji) returned #{emoji}#{", so is omitted" unless emoji}."
+
+    render json: { welcome: message, explanation: explain }
   end
 end
