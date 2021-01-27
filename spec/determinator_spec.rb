@@ -25,7 +25,7 @@ describe Determinator do
     let(:id) { 'id' }
     let(:guid) { 'guid' }
     let(:determination) { 'variant' }
-    let(:feature) { FactoryGirl.create(:feature) }
+    let(:feature) { FactoryBot.create(:feature) }
 
     it 'sets the determination callback' do
       determiantion_notified = false

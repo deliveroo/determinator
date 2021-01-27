@@ -17,7 +17,7 @@ describe Determinator::Explainer do
     end
 
     context 'with logs' do
-      let(:feature) { FactoryGirl.build(:feature) }
+      let(:feature) { FactoryBot.build(:feature) }
       let(:log_statement) { instance.log(:start, { feature: feature }) }
       let(:perform) { instance.explain { log_statement } }
 
@@ -32,7 +32,7 @@ describe Determinator::Explainer do
   end
 
   describe 'log' do
-    let(:feature) { FactoryGirl.build(:feature) }
+    let(:feature) { FactoryBot.build(:feature) }
     let(:perform) { instance.log(:start, { feature: feature }) }
 
     before do

@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 Dir["./spec/support/**/*.rb"].each {|f| require f}
 require 'determinator'
-require 'factory_girl'
+require 'factory_bot'
 require 'rspec/its'
 
 RSpec.configure do |config|
@@ -9,9 +9,9 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
 end
 
-FactoryGirl.define do
+FactoryBot.define do
   initialize_with { new(attributes) }
   skip_create
 end
 
-FactoryGirl.find_definitions
+FactoryBot.find_definitions

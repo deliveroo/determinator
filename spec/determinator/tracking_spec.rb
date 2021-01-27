@@ -42,7 +42,7 @@ describe Determinator::Tracking do
     end
 
     context 'when started' do
-      let(:feature) { FactoryGirl.build(:feature, name: 'test_feature') }
+      let(:feature) { FactoryBot.build(:feature, name: 'test_feature') }
 
       before do
         described_class.start!(:test)

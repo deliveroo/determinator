@@ -5,13 +5,13 @@ describe Determinator::Feature do
     subject(:method_call) { instance.experiment? }
 
     context 'when the feature is an experiment' do
-      let(:instance) { FactoryGirl.create(:experiment) }
+      let(:instance) { FactoryBot.create(:experiment) }
 
       it { should eq true }
     end
 
     context 'when the feature is not an experiment' do
-      let(:instance) { FactoryGirl.create(:feature) }
+      let(:instance) { FactoryBot.create(:feature) }
 
       it { should eq false }
     end
@@ -21,13 +21,13 @@ describe Determinator::Feature do
     subject(:method_call) { instance.feature_flag? }
 
     context 'when the feature is an experiment' do
-      let(:instance) { FactoryGirl.create(:experiment) }
+      let(:instance) { FactoryBot.create(:experiment) }
 
       it { should eq false }
     end
 
     context 'when the feature is not an experiment' do
-      let(:instance) { FactoryGirl.create(:feature) }
+      let(:instance) { FactoryBot.create(:feature) }
 
       it { should eq true }
     end
@@ -37,13 +37,13 @@ describe Determinator::Feature do
     subject { feature.active? }
 
     context 'when feature is active' do
-      let(:feature) { FactoryGirl.create(:feature, :active) }
+      let(:feature) { FactoryBot.create(:feature, :active) }
 
       it { should be_truthy }
     end
 
     context 'when feature is inactive' do
-      let(:feature) { FactoryGirl.create(:feature) }
+      let(:feature) { FactoryBot.create(:feature) }
 
       it { should be_falsey }
     end
@@ -53,26 +53,26 @@ describe Determinator::Feature do
     subject { feature.structured? }
 
     context 'when feature is not structured' do
-      let(:feature) { FactoryGirl.create(:feature) }
+      let(:feature) { FactoryBot.create(:feature) }
 
       it { should eq false }
 
       context 'when structured_bucket is an empty string' do
-        let(:feature) { FactoryGirl.create(:feature, structured_bucket: '') }
+        let(:feature) { FactoryBot.create(:feature, structured_bucket: '') }
 
         it { should eq false }
       end
     end
 
     context 'when feature is structured' do
-      let(:feature) { FactoryGirl.create(:feature, :structured) }
+      let(:feature) { FactoryBot.create(:feature, :structured) }
 
       it { should eq true }
     end
   end
 
   describe 'when a fixed determination is present' do
-    let(:instance) { FactoryGirl.create(:experiment, fixed_determinations: [fixed_determination]) }
+    let(:instance) { FactoryBot.create(:experiment, fixed_determinations: [fixed_determination]) }
 
     context 'when the variant is not present in the variants' do
       let(:fixed_determination) { {'feature_on' => true, 'variant' => 'c', 'constraints' => {}} }
