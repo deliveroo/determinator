@@ -78,12 +78,10 @@ GEM
     method_source (1.0.0)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
-    mini_portile2 (2.5.0)
     minitest (5.14.3)
     multipart-post (2.1.1)
     nio4r (2.5.4)
-    nokogiri (1.11.1)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.11.1-x86_64-darwin)
       racc (~> 1.4)
     puma (3.12.6)
     racc (1.5.2)
@@ -133,7 +131,7 @@ GEM
     websocket-extensions (0.1.5)
 
 PLATFORMS
-  ruby
+  x86_64-darwin-19
 
 DEPENDENCIES
   byebug
@@ -143,4 +141,4 @@ DEPENDENCIES
   rails (~> 5.1)
 
 BUNDLED WITH
-   1.17.3
+   2.2.7
