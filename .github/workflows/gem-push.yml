@@ -11,6 +11,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      run: |
+        git config user.email "rooci@deliveroo.co.uk"
+        git config user.name "Determinator Release Github Action"
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
