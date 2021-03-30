@@ -84,7 +84,7 @@ module Determinator
       TargetGroup.new(
         name: target_group['name'],
         rollout: target_group['rollout'].to_i,
-        constraints: parse_constraints(constraints)
+        constraints: constraints
       )
 
     # Invalid target groups are ignored
@@ -111,17 +111,11 @@ module Determinator
         name: fixed_determination['name'],
         feature_on: fixed_determination['feature_on'],
         variant: variant,
-        constraints: parse_constraints(constraints)
+        constraints: constraints
       )
     # Invalid fixed determinations are ignored
     rescue
       nil
-    end
-
-    def parse_constraints(constraints)
-      constraints.each_with_object({}) do |(key, value), hash|
-        hash[key.to_s] = [*value].map(&:to_s)
-      end
     end
   end
 end
