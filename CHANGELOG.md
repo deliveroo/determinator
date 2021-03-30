@@ -1,3 +1,10 @@
+# 2.7.0
+
+⚠️ This release includes breaking changes ⚠️
+
+Interface change:
+- Constraints which are not arrays of strings are no longer accepted; if present, the library returns false and logs an error.
+
 # 2.6.0
 
 Interface change:
