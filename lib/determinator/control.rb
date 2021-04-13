@@ -219,6 +219,9 @@ module Determinator
     end
 
     def matches_constraints(normalised_properties, constraints)
+      unless constraints.all?{ |k, v| k.is_a?(String) && v.all?{ |vv| vv.is_a?(String) } }
+        raise "Constraints must by arrays of strings"
+      end
       constraints.reduce(true) do |fit, (scope, *required)|
         present = [*normalised_properties[scope]]
         fit && matches_requirements?(scope, required, present)
