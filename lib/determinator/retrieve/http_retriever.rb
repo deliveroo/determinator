@@ -17,7 +17,7 @@ module Determinator
         return MissingResponse.new if response.status == 404
       rescue => e
         Determinator.notice_error(e)
-        after_hook(500)
+        after_hook(500, e)
         ErrorResponse.new
       end
 
@@ -43,9 +43,9 @@ module Determinator
 
       private
 
-      def after_hook(args)
+      def after_hook(status, error = nil)
         return unless @after_retrieve
-        @after_retrieve.call(args)
+        @after_retrieve.call(status, error)
       end
 
       def before_hook

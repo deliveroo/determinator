@@ -94,9 +94,10 @@ RSpec.describe Determinator::Retrieve::HttpRetriever do
 
         it 'runs block in retrieve and returns 200 status' do
           expect(foo_bar).to receive(:some_method).once
-          subject.after_retrieve do |res|
+          subject.after_retrieve do |res, err|
             foo_bar.some_method
             expect(res).to eq 200
+            expect(err).to be_nil
           end
           retrieve
         end
@@ -110,9 +111,10 @@ RSpec.describe Determinator::Retrieve::HttpRetriever do
 
         it 'runs block in retrieve and return 404 status' do
           expect(foo_bar).to receive(:some_method).once
-          subject.after_retrieve do |res|
+          subject.after_retrieve do |res, err|
             foo_bar.some_method
             expect(res).to eq 404
+            expect(err).to be_nil
           end
           retrieve
         end
@@ -125,9 +127,10 @@ RSpec.describe Determinator::Retrieve::HttpRetriever do
 
         it 'runs block in retrieve and return 500 status' do
           expect(foo_bar).to receive(:some_method).once
-          subject.after_retrieve do |res|
+          subject.after_retrieve do |res, err|
             foo_bar.some_method
             expect(res).to eq 500
+            expect(err).to be_instance_of(StandardError)
           end
           retrieve
         end
