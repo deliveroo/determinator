@@ -84,16 +84,57 @@ RSpec.describe Determinator::Retrieve::HttpRetriever do
         allow(foo_bar).to receive(:some_method).and_return(true)
 
         allow(Determinator).to receive(:notice_error)
-        stub_request(:get, expected_url).
-          to_return(status: 200, body: feature_json.to_json)
       end
 
-      it 'runs block in retrieve' do
-        expect(foo_bar).to receive(:some_method).once
-        subject.after_retrieve do |res|
-          foo_bar.some_method
+      context 'when success response' do
+        before :each do
+          stub_request(:get, expected_url).
+            to_return(status: 200, body: feature_json.to_json)
         end
-        retrieve
+
+        it 'runs block in retrieve and returns 200 status' do
+          expect(foo_bar).to receive(:some_method).once
+          subject.after_retrieve do |res|
+            foo_bar.some_method
+            expect(res).to eq 200
+          end
+          retrieve
+        end
+      end
+
+      context 'when response has 404 status' do
+        before :each do
+          stub_request(:get, expected_url).
+            to_return(status: 404, body: feature_json.to_json)
+        end
+
+        it 'runs block in retrieve and return 404 status' do
+          expect(foo_bar).to receive(:some_method).once
+          subject.after_retrieve do |res|
+            foo_bar.some_method
+            expect(res).to eq 404
+          end
+          retrieve
+        end
+      end
+
+      context 'when response failed' do
+        before :each do
+          allow_any_instance_of(Faraday::Connection).to receive(:get).and_raise(StandardError)
+        end
+
+        it 'runs block in retrieve and return 500 status' do
+          expect(foo_bar).to receive(:some_method).once
+          subject.after_retrieve do |res|
+            foo_bar.some_method
+            expect(res).to eq 500
+          end
+          retrieve
+        end
+
+        it 'does not raise error' do
+          expect { retrieve }.not_to raise_error
+        end
       end
 
       it 'does not run block if retrieve is not called' do

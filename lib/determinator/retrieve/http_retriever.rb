@@ -12,17 +12,12 @@ module Determinator
       def retrieve(name)
         before_hook
         response = @connection.get("/features/#{name}")
-        if response.status == 200
-          after_hook(Determinator::Serializers::JSON.load(response.body))
-          return Determinator::Serializers::JSON.load(response.body)
-        end
-        if response.status == 404
-          after_hook(MissingResponse.new)
-          return MissingResponse.new
-        end
+        after_hook(response.status)
+        return Determinator::Serializers::JSON.load(response.body) if response.status == 200
+        return MissingResponse.new if response.status == 404
       rescue => e
         Determinator.notice_error(e)
-        after_hook(ErrorResponse.new)
+        after_hook(500)
         ErrorResponse.new
       end
 
