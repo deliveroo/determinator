@@ -208,6 +208,26 @@ variant = determinator.which_variant(
 The `app_version` constraint for that flag needs to follow ruby gem version constraints. We support the following operators: `>, <, >=, <=, ~>`. For example:
 `app_version: ">=1.2.0"`
 
+### Using hooks for retriever
+
+```HttpRetriever``` has ```before_retrieve``` and ```after_retrieve``` hooks.
+
+Example of usage:
+```ruby
+http_retriever = Determinator::Retrieve::HttpRetriever.new(faraday_connection)
+
+http_retriever.before_retrieve do 
+  do_something
+end
+
+http_retriever.after_retrieve do |status, err|
+  raise err if err
+  do_something(status)
+end
+```
+
+
+
 ### Using Determinator in RSpec
 
 * Include the  `spec_helper.rb`.

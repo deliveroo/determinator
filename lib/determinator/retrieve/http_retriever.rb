@@ -45,11 +45,13 @@ module Determinator
 
       def after_hook(status, error = nil)
         return unless @after_retrieve
+
         @after_retrieve.call(status, error)
       end
 
       def before_hook
         return unless @before_retrieve
+
         @before_retrieve.call
       end
     end
