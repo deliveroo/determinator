@@ -34,11 +34,11 @@ module Determinator
       end
 
       def before_retrieve(&block)
-        @before_retrieve ||= block
+        @before_retrieve = block
       end
 
       def after_retrieve(&block)
-        @after_retrieve ||= block
+        @after_retrieve = block
       end
 
       private
