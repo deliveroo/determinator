@@ -156,6 +156,23 @@ or in instances where the event bus provides a full feature object with a name i
 
 This will expire both the limited local cache and the larger shared cache.
 
+### Using hooks for retriever
+
+```HttpRetriever``` has ```before_retrieve``` and ```after_retrieve``` hooks.
+
+Example of usage:
+```ruby
+http_retriever = Determinator::Retrieve::HttpRetriever.new(faraday_connection)
+
+http_retriever.before_retrieve do 
+  do_something
+end
+
+http_retriever.after_retrieve do |status, err|
+  raise err if err
+  do_something(status)
+end
+```
 ## Further Usage
 
 Once this is done you can ask for a determination like this:

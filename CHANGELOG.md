@@ -1,3 +1,8 @@
+# 2.7.1
+
+Feature:
+- Add `before_retrieve` and `after_retrieve` hooks for `Determinator::Retrieve::HttpRetriever`
+
 # 2.7.0
 
 ⚠️ This release includes breaking changes ⚠️

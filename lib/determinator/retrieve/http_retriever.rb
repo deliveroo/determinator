@@ -10,11 +10,14 @@ module Determinator
       end
 
       def retrieve(name)
+        before_hook
         response = @connection.get("/features/#{name}")
+        after_hook(response.status)
         return Determinator::Serializers::JSON.load(response.body) if response.status == 200
         return MissingResponse.new if response.status == 404
       rescue => e
         Determinator.notice_error(e)
+        after_hook(500, e)
         ErrorResponse.new
       end
 
@@ -28,6 +31,28 @@ module Determinator
       # @return [String, nil] a feature name or nil
       def get_name(url)
         (url.match('features\/(.*)\z') || [])[1]
+      end
+
+      def before_retrieve(&block)
+        @before_retrieve = block
+      end
+
+      def after_retrieve(&block)
+        @after_retrieve = block
+      end
+
+      private
+
+      def after_hook(status, error = nil)
+        return unless @after_retrieve
+
+        @after_retrieve.call(status, error)
+      end
+
+      def before_hook
+        return unless @before_retrieve
+
+        @before_retrieve.call
       end
     end
   end
