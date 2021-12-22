@@ -267,7 +267,7 @@ module Determinator
         return guid if guid.to_s != ''
 
         explainer.log(:missing_identifier, { identifier_type: 'GUID' })
-        raise ArgumentError, 'A GUID must always be given for GUID bucketed features'
+        return
       when :fallback
         identifier = (id || guid).to_s
         return identifier if identifier != ''
