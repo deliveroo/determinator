@@ -124,13 +124,9 @@ module Determinator
       # require_variant_determination?
       return true unless require_variant_determination?(feature)
 
-
-
       explainer.log(:chosen_variant) {
         variant_for(feature, indicators.variant)
       }
-    rescue ArgumentError
-      raise
 
     rescue => e
       Determinator.notice_error(e)
@@ -267,7 +263,7 @@ module Determinator
         return guid if guid.to_s != ''
 
         explainer.log(:missing_identifier, { identifier_type: 'GUID' })
-        return
+        raise ArgumentError, 'A GUID must always be given for GUID bucketed features'
       when :fallback
         identifier = (id || guid).to_s
         return identifier if identifier != ''
