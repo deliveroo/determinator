@@ -4,7 +4,7 @@ require 'set'
 
 describe Determinator::Control do
   context "determinator-standard-tests" do
-    TESTS_WRITTEN_FOR = Gem::Dependency.new('determinator-standard-tests', '~> 1.1')
+    TESTS_WRITTEN_FOR = Gem::Dependency.new('determinator-standard-tests', '~> 1.1.4')
     STANDARDS_DIR = Pathname.new('spec/standard_cases')
 
     subject(:determinator_instance) do
