@@ -245,7 +245,8 @@ module Determinator
         !v.match?(Semantic::Version::SemVerRegexp)
       end
       invalid_groups = required.flatten.select do |v|
-        !v.match?(/\d/)
+        without_operator = v.gsub(/>=|>|<=|<|~>/, '')
+        !without_operator.match?(Semantic::Version::SemVerRegexp)
       end
 
       return false if (invalid_properties + invalid_groups).any?
