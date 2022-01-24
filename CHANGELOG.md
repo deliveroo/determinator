@@ -1,3 +1,8 @@
+# 2.7.2
+
+Feature:
+- When a GUID bucketed feature is misconfigured, handle the error and return false.
+
 # 2.7.1
 
 Feature:
