@@ -124,13 +124,9 @@ module Determinator
       # require_variant_determination?
       return true unless require_variant_determination?(feature)
 
-
-
       explainer.log(:chosen_variant) {
         variant_for(feature, indicators.variant)
       }
-    rescue ArgumentError
-      raise
 
     rescue => e
       Determinator.notice_error(e)
