@@ -241,7 +241,8 @@ module Determinator
         !v.match?(Semantic::Version::SemVerRegexp)
       end
       invalid_groups = required.flatten.select do |v|
-        without_operator = v.gsub(/>=|>|<=|<|~>/, '')
+        version_sections = v.split(/(\d(.+)?)/, 2)
+        without_operator = version_sections[1]&.strip || ''
         !without_operator.match?(Semantic::Version::SemVerRegexp)
       end
 
