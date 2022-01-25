@@ -1,3 +1,8 @@
+# 2.9.0
+
+Feature:
+- When an app_version does not comply with semantic versioning specifications (e.g.: 2021.11.05 with a trailing zero instead of the correct 2021.11.5), return false.
+
 # 2.8.0
 
 Feature:
