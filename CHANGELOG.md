@@ -1,3 +1,8 @@
+# 2.9.1
+
+Feature:
+- Add `callback` argument to Control, allowing custom logic to notice the determination.
+
 # 2.9.0
 
 Feature:

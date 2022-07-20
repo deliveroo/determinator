@@ -76,5 +76,35 @@ describe Determinator::Control do
         expect(totals[false]).to be_within(leeway).of(determinations / 2)
       end
     end
+
+    context 'with determination callback' do
+      let(:callback) { double('callback') }
+
+      before do
+        determinator_instance.on_determination{ |name, args, determination| callback.call(name, args, determination) }
+      end
+
+      let(:feature_name) { 'feature_flags/simple/full_rollout_id.json' }
+
+      it 'calls the callback' do
+        expect(callback).to receive(:call).with(feature_name, hash_including(id: 1, properties: {a: 'b'}), true)
+        outcome = determinator_instance.feature_flag_on?(feature_name, id: 1, properties: {a: 'b'})
+        expect(outcome).to eq(true)
+      end
+
+      context 'missing feature' do
+        let(:feature_name) { 'missing' }
+
+        before do
+          allow(error_logger).to receive(:call)
+        end
+
+        it 'calls the callback with the false outcome' do
+          expect(callback).to receive(:call).with(feature_name, hash_including(id: 1, properties: {a: 'b'}), false)
+          outcome = determinator_instance.feature_flag_on?(feature_name, id: 1, properties: {a: 'b'})
+          expect(outcome).to eq(false)
+        end
+      end
+    end
   end
 end

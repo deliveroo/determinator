@@ -72,6 +72,20 @@ module Determinator
       '#<Determinator::Control>'
     end
 
+    # Defines code that should execute when a determination is completed. This is particularly
+    # helpful for comparing determinations made by this control with other mechanisms.
+    #
+    # Please note that this block will be executed _synchronously_ before delivering the determination to the callsite.
+    #
+    # @yield [name, arguments, determination] Will be called when a determination was requested for the
+    #   specified feature with `name`, with the given keyword arguments.
+    # @yieldparam name [String, nil] The name of the feature
+    # @yieldparam args [Hash] The keyword arguments passed to the determination method. This includes :id, :guid, :properties.
+    # @yieldparam determination [String,Boolean] The result of the determination
+    def on_determination(&block)
+      @determination_callback = block
+    end
+
     private
 
     Indicators = Struct.new(:rollout, :variant)
@@ -81,11 +95,13 @@ module Determinator
 
       if feature.nil? || feature.is_a?(ErrorResponse) || feature.is_a?(MissingResponse)
         Determinator.notice_missing_feature(name)
+        run_determination_callback(name, {id: id, guid: guid, properties: properties}, false)
         return false
       end
 
       determinate(feature, id: id, guid: guid, properties: properties).tap do |determination|
         Determinator.notice_determination(id, guid, feature, determination)
+        run_determination_callback(name, {id: id, guid: guid, properties: properties}, determination)
       end
     end
 
@@ -319,6 +335,11 @@ module Determinator
       properties.each_with_object({}) do |(name, values), hash|
         hash[name.to_s] = [*values].map(&:to_s)
       end
+    end
+
+    def run_determination_callback(name, args, determination)
+      return unless @determination_callback
+      @determination_callback.call(name, args, determination)
     end
   end
 end
