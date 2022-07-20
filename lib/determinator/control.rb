@@ -99,10 +99,11 @@ module Determinator
         return false
       end
 
-      determinate(feature, id: id, guid: guid, properties: properties).tap do |determination|
+      result = determinate(feature, id: id, guid: guid, properties: properties).tap do |determination|
         Determinator.notice_determination(id, guid, feature, determination)
-        run_determination_callback(name, {id: id, guid: guid, properties: properties}, determination)
       end
+      run_determination_callback(name, {id: id, guid: guid, properties: properties}, result)
+      result
     end
 
     def determinate(feature, id:, guid:, properties:)
