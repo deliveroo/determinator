@@ -1,3 +1,8 @@
+# 2.9.2
+
+Bug fix:
+- Fix parsing fixed determinations when the variant is an empty string
+
 # 2.9.1
 
 Feature:
