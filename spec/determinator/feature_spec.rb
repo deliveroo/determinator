@@ -89,5 +89,13 @@ describe Determinator::Feature do
         expect(instance.fixed_determinations).to be_empty
       end
     end
+
+    context 'when the variant is blank' do
+      let(:fixed_determination) { {'feature_on' => true, 'variant' => '', 'constraints' => {}} }
+
+      it 'should not be ignored' do
+        expect(instance.fixed_determinations.first.feature_on).to eq(true)
+      end
+    end
   end
 end
