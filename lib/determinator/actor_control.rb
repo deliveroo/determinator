@@ -24,18 +24,14 @@ module Determinator
     end
 
     # @see Determinator::Control#feature_flag_on?
-    def feature_flag_on?(name, properties: {})
+    def feature_flag_on?(name, properties: {}, feature: nil)
       controller.feature_flag_on?(
         name,
         id: id,
         guid: guid,
-        properties: default_properties.merge(properties)
+        properties: default_properties.merge(properties),
+        feature: feature
       )
-    end
-
-    # @see Determinator::Control#retrieve
-    def retrieve(name)
-      controller.retrieve(name)
     end
 
     def inspect
