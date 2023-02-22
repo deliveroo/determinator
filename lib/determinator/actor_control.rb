@@ -33,6 +33,11 @@ module Determinator
       )
     end
 
+    # @see Determinator::Control#retrieve
+    def retrieve(name)
+      controller.retrieve(name)
+    end
+
     def inspect
       "#<Determinator::ActorControl id=#{id.inspect} guid=#{guid.inspect}>"
     end
