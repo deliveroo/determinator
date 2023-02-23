@@ -13,7 +13,10 @@ module Determinator
       # Call walks through each cache, returning a value if the item exists in
       # any cache, otherwise popularing each cache with the value of yield.
       def call(feature_name)
-        value = read_and_upfill(feature_name)
+        value =
+          @mutex.synchronize do
+            read_and_upfill(feature_name)
+          end
 
         # if the value is missing and we cache it, return the missing response
         return value if value.is_a?(MissingResponse) && @cache_missing
@@ -53,20 +56,18 @@ module Determinator
       # @param url [String] a feature name
       # @return [Feature, MissingResponse] nil when no value is found
       def read_and_upfill(feature_name)
-        @mutex.synchronize do
-          @caches.each.with_index do |cache, index|
-            if cache.exist?(key(feature_name))
-              value = cache.read(key(feature_name))
-              @caches[0...index].each do |cache|
-                cache.write(key(feature_name), value)
-              end
-
-              return value
+        @caches.each.with_index do |cache, index|
+          if cache.exist?(key(feature_name))
+            value = cache.read(key(feature_name))
+            @caches[0...index].each do |cache|
+              cache.write(key(feature_name), value)
             end
-          end
 
-          return nil
+            return value
+          end
         end
+
+        return nil
       end
     end
   end
