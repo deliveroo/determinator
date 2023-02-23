@@ -7,12 +7,16 @@ module Determinator
       def initialize(*caches, cache_missing: true)
         @cache_missing = cache_missing
         @caches = caches
+        @mutex = Mutex.new
       end
 
       # Call walks through each cache, returning a value if the item exists in
       # any cache, otherwise popularing each cache with the value of yield.
       def call(feature_name)
-        value = read_and_upfill(feature_name)
+        value =
+          @mutex.synchronize do
+            read_and_upfill(feature_name)
+          end
 
         # if the value is missing and we cache it, return the missing response
         return value if value.is_a?(MissingResponse) && @cache_missing
@@ -22,14 +26,20 @@ module Determinator
 
         value_to_write = yield
         return value_to_write if value_to_write.is_a?(ErrorResponse)
-        @caches.each do |cache|
-          cache.write(key(feature_name), value_to_write)
+
+        @mutex.synchronize do
+          @caches.each do |cache|
+            cache.write(key(feature_name), value_to_write)
+          end
         end
+
         return value_to_write
       end
 
       def expire(feature_name)
-        @caches.each{ |c| c.delete(key(feature_name)) }
+        @mutex.synchronize do
+          @caches.each{ |c| c.delete(key(feature_name)) }
+        end
       end
 
       private
@@ -52,9 +62,11 @@ module Determinator
             @caches[0...index].each do |cache|
               cache.write(key(feature_name), value)
             end
+
             return value
           end
         end
+
         return nil
       end
     end

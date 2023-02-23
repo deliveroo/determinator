@@ -14,22 +14,24 @@ module Determinator
     end
 
     # @see Determinator::Control#which_variant
-    def which_variant(name, properties: {})
+    def which_variant(name, properties: {}, feature: nil)
       controller.which_variant(
         name,
         id: id,
         guid: guid,
-        properties: default_properties.merge(properties)
+        properties: default_properties.merge(properties),
+        feature: feature
       )
     end
 
     # @see Determinator::Control#feature_flag_on?
-    def feature_flag_on?(name, properties: {})
+    def feature_flag_on?(name, properties: {}, feature: nil)
       controller.feature_flag_on?(
         name,
         id: id,
         guid: guid,
-        properties: default_properties.merge(properties)
+        properties: default_properties.merge(properties),
+        feature: feature
       )
     end
 

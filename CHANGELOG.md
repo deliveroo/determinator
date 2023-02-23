@@ -1,3 +1,9 @@
+# 2.9.3
+
+Feature:
+- Add optional `feature` argument to `feature_flag_on?` and `which_variant` methods of ActorControl, to reuse an existing feature.
+- Add mutex to synchronise access to caches in Cache::FetchWrapper.
+
 # 2.9.2
 
 Bug fix:
