@@ -75,6 +75,29 @@ jobs:
           command: |
             bundle exec rspec --format documentation
 
+  build_2.7:
+    docker:
+      - image: circleci/ruby:2.7
+    steps:
+      - checkout
+
+      - run:
+          name: Install bundler
+          command: gem install bundler -v 2.1.4
+
+      - run:
+          name: Bundle Install
+          command: bundle install
+
+      - run:
+          name: Include standard tests
+          command: git submodule update --init
+
+      - run:
+          name: Run rspec
+          command: |
+            bundle exec rspec --format documentation
+
     
 
 workflows:
@@ -87,4 +110,6 @@ workflows:
       - build_2.5
       
       - build_2.6
+
+      - build_2.7
       
