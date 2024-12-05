@@ -252,7 +252,7 @@ RSpec.describe "something", :determinator_support do
     forced_determination(:my_targeted_feature_flag, false, only_for: { id: 12345 })
 
     it "uses forced_determination" do
-      determinator = Determinator.for_actor(id: 1)
+      determinator = Determinator.instance.for_actor(id: 1)
 
       expect(determinator.feature_flag_on?(:my_feature_flag)).to be true
       expect(determinator.which_variant(:my_experiment)).to eq("variant_a")
