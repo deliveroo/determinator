@@ -6,7 +6,7 @@ jobs:
   
   build_2.4:
     docker:
-      - image: circleci/ruby:2.4
+      - image: circleci/ruby:2.7
     steps:
       - checkout
 
@@ -30,7 +30,7 @@ jobs:
     
   build_2.5:
     docker:
-      - image: circleci/ruby:2.5
+      - image: circleci/ruby:2.7
     steps:
       - checkout
 
@@ -54,7 +54,7 @@ jobs:
     
   build_2.6:
     docker:
-      - image: circleci/ruby:2.6
+      - image: circleci/ruby:2.7
     steps:
       - checkout
 
